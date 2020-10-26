@@ -1,17 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middlewares/auth");
+const checkAuth = require("../middlewares/auth");
 const  {getTag,getAllTags,createTag, updateTag,deleteTag}= require('../controllers/Tag')
 
 
-router.get("/all_tags", getAllTags);
+router.get("/", getAllTags);
 
-router.get("/tag/:tagId", getTag);
+// router.get("/tags/:tagId", getTag);
 
-router.post("/new_tag",auth, createTag);
+router.post("/new",checkAuth, createTag);
 
-router.patch("/edit/tag/:tagId",auth, updateTag);
+router.patch("/:tagId",checkAuth, updateTag);
 
-router.post("/delete/Tag/:tagId",auth, deleteTag);
+router.post("/:tagId",checkAuth, deleteTag);
 
 module.exports = router;

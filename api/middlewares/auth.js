@@ -1,5 +1,6 @@
 
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 module.exports=(req,res,next)=>{
     
@@ -22,8 +23,12 @@ module.exports=(req,res,next)=>{
         req.isAuth = false
         return next()
     }
+    const user = User.findById(decodedToken.userId);
+    if(!user.validToken&&decodedToken){
+        req.isAuth = false
+        return next()
+    }
     req.isAuth = true
     req.userId = decodedToken.userId
     next()
-
 }
