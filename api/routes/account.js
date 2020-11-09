@@ -6,7 +6,8 @@ const router = express.Router();
 const accountController = require('../controllers/account')
 
 router.get('/login',accountController.userLogin);
-router.get('/logout',accountController.userLogout);
+router.get('/new_password',auth,accountController.updateUserPassword);
+router.get('/logout',auth,accountController.userLogout);
 router.post('/signUp', accountController.createUser);
 
 

@@ -41,7 +41,7 @@ exports.createCategory = async (req, res, next) => {
         await validate(categoryImage,imageProperties),
     ].filter(e=>e!==true);
 
-    if(isError){
+    if(isError.length){
         return res.status(500).json({
             errors:errorsArray,
             message:"Invalid Input!",
@@ -94,7 +94,7 @@ exports.updateCategory = async (req, res, next) => {
         await validate(categoryImage,imageProperties),
     ].filter(e=>e!==true);
 
-    if(isError){
+    if(isError.length){
         return res.status(500).json({
             errors:errorsArray,
             message:"Invalid Input!",

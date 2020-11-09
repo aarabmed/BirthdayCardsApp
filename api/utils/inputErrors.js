@@ -1,11 +1,10 @@
 const validator = require('validator');
 
-module.exports = async (input,properties)=>{
-    
-    // const { isLength ,isEmpty, isMatch, isAlphabets} = properties
-    //const isLengthError;
+module.exports = async (value,properties)=>{
+    const input = !value?'':value;
+ 
+    let results;
     const { inputName, validation} = properties
-    let results 
     validation.forEach(prop => {
         const { isLength ,isEmpty, isMatch, isAlphabets, isBoolean, isImage} = prop
         if(isLength){
@@ -24,8 +23,8 @@ module.exports = async (input,properties)=>{
         
             }
         }
-    
-        if(!isEmpty){
+        
+        if(isEmpty===false){
             if(validator.isEmpty(input)){
                 return results = ({
                     [inputName]: `${inputName} input field is required !`,
@@ -33,7 +32,7 @@ module.exports = async (input,properties)=>{
             }
         }
     
-        if(isMatch){
+        if(isMatch===true){
             const match = isMatch.regex
             if(input.match(match)){
                 return results = ({
@@ -42,7 +41,7 @@ module.exports = async (input,properties)=>{
             }
         }
     
-        if(isAlphabets){
+        if(isAlphabets===true){
             const regex = /^[A-Za]+$/
             if(regex.test(input)){
                 return results =({
@@ -50,14 +49,14 @@ module.exports = async (input,properties)=>{
                 })
             }
         }
-        if(isImage){
+        if(isImage===true){
             if(!input){
                 return results = ({
                     [inputName]: 'No image provided!',
                 })
             }
         }
-        if(isBoolean){
+        if(isBoolean===true){
             if(typeof input !=='boolean'){
                 return results = ({
                     [inputName]: `${inputName} input takes only boolean value!`,

@@ -1,10 +1,9 @@
 require('dotenv').config();
-const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const {loginInputs, signupInputs} = require('./inputs/account')
 const validate = require('../utils/inputErrors');
+const {loginInputs, signupInputs} = require('./inputs/account')
 
 //! ----- LOGIN A USER ----------
 exports.userLogin = async (req, res, next) => {
@@ -18,8 +17,7 @@ exports.userLogin = async (req, res, next) => {
         await validate(password,passwordProperties),
     ].filter(e=>e!==true);
 
-
-    if(isError){
+    if(isError.length){
         return res.status(500).json({
             errors:isError,
             message:'Invalid Input!'
@@ -81,6 +79,57 @@ exports.userLogout = async (req, res, next) => {
 } 
 
 
+//! -----SET NEW PASSWORD ----------
+exports.updateUserPassword = async (req, res, next) => {
+    
+    const oldPassword = req.body.oldPassword;
+    const password = req.body.password;
+    const userId = req.userId;
+
+    const {passwordProperties,oldPasswordProperties} = signupInputs;
+
+    const isError = [
+        await validate(password,oldPasswordProperties),
+        await validate(password,passwordProperties),
+    ].filter(e=>e!==true);
+
+    if(isError.length){
+        return res.status(500).json({
+            errors:isError,
+            message:'Invalid Input!'
+        })
+    }
+
+    const user = await User.findOne({_id:userId})
+    if(!user){
+        return res.status(404).json({
+            message:'no user have been found, try again'
+        })
+    }
+
+    const checkPassword = await bcrypt.compare(oldPassword,user.password)
+    if(!checkPassword){
+        return res.status().json({
+            message:'Old password is incorrect'
+        })
+    }
+    const hashPassword = await bcrypt.hash(password,12)
+    user.password = hashPassword;
+
+    const newUser = await user.save();
+    if(!newUser){
+        return res.status(500).json({
+            message:'Error while updating the password'
+        })
+    }
+    return res.status(200).json({
+        data:{userName:newUser.userName,authority:newUser.authority,avatar:newUser.avatar,updatedAt:newUser.updatedAt.toISOString()},
+        message:'password updated successfully'
+    })
+}
+
+
+
 //! ----- CREATE A NEW USER ----------
 exports.createUser = async (req, res, next) => {
     const userName = req.body.userName;
@@ -93,7 +142,7 @@ exports.createUser = async (req, res, next) => {
     ].filter(e=>e!==true);
 
 
-    if(isError){
+    if(isError.length){
         return res.status(500).json({
             errors:isError,
             message:'Invalid Input!'

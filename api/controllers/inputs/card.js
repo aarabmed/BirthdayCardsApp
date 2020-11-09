@@ -1,7 +1,7 @@
 
 module.exports ={
     titleProps:{
-        inputName:'Title',
+        inputName:'title',
         validation:[
             {
                 isEmpty:false
@@ -23,7 +23,7 @@ module.exports ={
         inputName:'cardImage',
         validation:[
             {
-                isImage:false
+                isImage:true
             }
         ]
     },

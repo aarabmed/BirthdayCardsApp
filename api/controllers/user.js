@@ -1,7 +1,7 @@
 
-const validator = require('validator');
-const bcrypt = require('bcrypt');
+
 const User = require('../models/user')
+const validate = require('../utils/inputErrors');
 const {signupInputs} = require('./inputs/account')
 
 
@@ -67,44 +67,31 @@ exports.getAllUsers = async (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
     const userName = req.body.userName;
-    const oldPassword = req.body.oldPassword;
-    const password = req.body.password;
     const avatar = req.body.avatar
     const authority = req.body.authority;
     const userId = req.userId;
 
-    const {userNameProperties,passwordProperties,oldPasswordProperties} = signupInputs;
+    const {userNameProperties} = signupInputs;
 
     const isError = [
         await validate(userName,userNameProperties),
-        await validate(password,oldPasswordProperties),
-        await validate(password,passwordProperties),
     ].filter(e=>e!==true);
 
-    if(isError){
+    if(isError.length){
         return res.status(500).json({
             errors:isError,
             message:'Invalid Input!'
         })
     }
 
-    const user = User.findOne({_id:userId})
+    const user = await User.findOne({_id:userId})
     if(!user){
         return res.status(404).json({
             message:'no user have been found, try again'
         })
     }
 
-    const checkPassword = await bcrypt.compare(oldPassword,user.password)
-    if(!checkPassword){
-        return res.status().json({
-            message:'Old password is incorrect'
-        })
-    }
-    const hashPassword = await bcrypt.hash(password,12)
-
     user.userName = userName;
-    user.password = hashPassword;
     user.authority = authority;
     user.avatar = avatar;
 

@@ -2,9 +2,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-module.exports=(req,res,next)=>{
+module.exports=async (req,res,next)=>{
     
     const authHeader = req.get('Authorization')
+
     if(!authHeader){
         const error = new Error('Not Authenticated');
         error.code=401;
@@ -21,18 +22,19 @@ module.exports=(req,res,next)=>{
         throw error
     }
     
+
     if(!decodedToken){
         const error = new Error('Not Authenticated');
         error.code=401;
         throw error
     }
-    const user = User.findById(decodedToken.userId);
+    const user = await User.findById(decodedToken.userId);
+
     if(!user.validToken&&decodedToken){
         const error = new Error('Not Authenticated');
         error.code=401;
         throw error
     }
-    console.log('OKKK')
     req.isAuth = true
     req.userId = decodedToken.userId
     next()

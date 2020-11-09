@@ -35,7 +35,7 @@ exports.createTag = async (req, res, next) => {
     ].filter(e=>e!==true);
 
 
-    if(isError){
+    if(isError.length){
         return res.status(500).json({
             errors:errorsArray,
             message:"Invalid Input!",
@@ -75,7 +75,7 @@ exports.updateTag = async (req, res, next) => {
     ].filter(e=>e!==true);
 
 
-    if(isError){
+    if(isError.length){
         return res.status(500).json({
             errors:errorsArray,
             message:"Invalid Input!",
@@ -112,7 +112,7 @@ exports.deleteTag = async (req, res, next) => {
     const currentUserId = req.userId
 
     const currentUser = await User.findById(currentUserId)
-    if(currentUser.authority=='ADMIN'){
+    if(currentUser.authority=='ADMIN'||currentUser.authority=='SUPER_ADMIN'){
         const tag = await Tag.findOne({_id:tagId})
         if(!tag){
             return res.status(404).json({

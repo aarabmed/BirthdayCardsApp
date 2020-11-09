@@ -79,7 +79,7 @@ exports.createCard = async (req, res, next) => {
 
 
     
-    if(isError){
+    if(isError.length){
         return res.status(500).json({
             errors:isError,
             message:'Invalid Input!'
@@ -138,6 +138,13 @@ exports.updateCard = async (req, res, next) => {
         await validate(cardSize,cardSizeProps),
         await validate(status,statusProps),
     ].filter(e=>e!==true);
+    
+    if(isError.length){
+        return res.status(500).json({
+            errors:isError,
+            message:'Invalid Input!'
+        })
+    }
 
 
     const newImage ={
