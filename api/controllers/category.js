@@ -2,6 +2,8 @@ const validator = require('validator');
 const multer = require('multer');
 const Category = require('../models/category');
 const User = require('../models/user');
+const validate = require('../utils/inputErrors');
+const {nameProperties,descriptionProperties,imageProperties} = require('./inputs/category')
 
 //! ----- RETRIEVE A SINGLE CATEGORY ----------
 /* exports.getCategory = async (req, res, next) => {
@@ -31,30 +33,20 @@ exports.createCategory = async (req, res, next) => {
     const name = req.body.name
     const description = req.body.description
     const categoryImage = req.file
-    const imageErrors = [];
-    const nameErrors =[];
-    const errorsArray =[]
-    const regex = /^[A-Za]+$/
-
-
     
-    if(!validator.isLength(name,{min:5})){
-        nameErrors.push("Category name minimum lenght is 5 characters");
-    }
-    if(regex.test(name)){
-        nameErrors.push("Category name takes only alphabets");
-    }
-
-
-    if(nameErrors.length){
-        errorsArray.push({name:nameErrors[0]})
-    }
     
-    if(!categoryImage){
-        imageErrors.push('No image provided!')
-    }
+    const isError = [
+        await validate(name,nameProperties),
+        await validate(description,descriptionProperties),
+        await validate(categoryImage,imageProperties),
+    ].filter(e=>e!==true);
 
-    
+    if(isError){
+        return res.status(500).json({
+            errors:errorsArray,
+            message:"Invalid Input!",
+        })
+    }
 
     const newImage ={
         imageName: categoryImage.filename,
@@ -64,14 +56,6 @@ exports.createCategory = async (req, res, next) => {
     }
     
 
-    if(errorsArray.length){
-        return res.status(500).json({
-            errors:errorsArray,
-            message:"Invalid Input!",
-        })
-    }
-
-    
     const newName= name.charAt(0).toUpperCase()+name.slice(1).toLowerCase();
     
     const category = await new Category({
@@ -95,6 +79,8 @@ exports.createCategory = async (req, res, next) => {
     })
 }
 
+
+
 //! ----- EDIT A CATEGORY ----------
 exports.updateCategory = async (req, res, next) => {
     const categoryId = req.body.categoryId;
@@ -102,35 +88,13 @@ exports.updateCategory = async (req, res, next) => {
     const description = req.body.description;
     const categoryImage = req.body.categoryImage;
 
-    const imageErrors = [];
-    const nameErrors =[];
-    const errorsArray =[]
-    const regex = /^[A-Za]+$/
+    const isError = [
+        await validate(name,nameProperties),
+        await validate(description,descriptionProperties),
+        await validate(categoryImage,imageProperties),
+    ].filter(e=>e!==true);
 
-    
-    if(validator.isLength(name,{min:5})){
-        nameErrors.push("Category name minimum lenght is 5 characters");
-    }
-    if(!regex.test(name)){
-        nameErrors.push("Category name takes only alphabets");
-    }
-
-    if(!categoryImage){
-        imageErrors.push('No image provided!')
-    }
-
-
-    if(nameErrors.length){
-        errorsArray.push({nameError:nameErrors[0]})
-    }
-    
-
-    if(imageErrors.length){
-        errorsArray.push({imageError:imageErrors[0]})
-    }
-
-
-    if(errorsArray.length){
+    if(isError){
         return res.status(500).json({
             errors:errorsArray,
             message:"Invalid Input!",
@@ -180,8 +144,8 @@ exports.updateCategory = async (req, res, next) => {
 //! ----- DELETE A CATEGORY ----------
 exports.deleteCategory = async (req, res, next) => {
     const categoryId = req.body.categoryId;
-    const currentUserId = req.body.currentUserId
-    
+    const currentUserId = req.userId
+
 
     const currentUser = await User.findById(currentUserId)
 

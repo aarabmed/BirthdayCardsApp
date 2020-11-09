@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const mongoosePaginate = require('mongoose-paginate-v2');
 const Schema = mongoose.Schema;
 
 const cardSchema = new Schema({
@@ -16,12 +16,12 @@ const cardSchema = new Schema({
     },
     category:{
         type:Schema.Types.ObjectId,
-        ref:'category'
+        ref:'Category'
     },
-    tag:{
+    tags:[{
         type:Schema.Types.ObjectId,
-        ref:'tag'
-    },
+        ref:'Tag'
+    }],
     image:{
         type:Object,
         required:true
@@ -38,5 +38,7 @@ const cardSchema = new Schema({
         required:true
     }
 },{timestamps: true})
+
+cardSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Card',cardSchema)

@@ -1,0 +1,34 @@
+
+module.exports={
+    nameProperties:{
+        inputName:'name',
+        validation:[
+            {
+                isEmpty:false
+            },
+            {
+                isLength:{min:5}
+            }
+            ,
+            {
+                isAlphabets:true,
+            },
+        ]
+    },
+    descriptionProperties:{
+        inputName:'description',
+        validation:[
+            {
+                isEmpty:false
+            }
+        ]
+    },
+    imageProperties:{
+        inputName:'categoryImage',
+        validation:[
+            {
+                isImage:true
+            }
+        ]
+    },
+}

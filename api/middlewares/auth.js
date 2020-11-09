@@ -6,28 +6,33 @@ module.exports=(req,res,next)=>{
     
     const authHeader = req.get('Authorization')
     if(!authHeader){
-        req.isAuth = false
-       return next()
+        const error = new Error('Not Authenticated');
+        error.code=401;
+        throw error
     }
     const token = authHeader.split(' ')[1];
     let decodedToken ;
     try {
         decodedToken = jwt.verify(token,process.env.JWT_SECRETCODE)
     } 
-    catch (error) {
-        req.isAuth = false
-        return next()
+    catch (err) {
+        const error = new Error('Not Authenticated');
+        error.code=401;
+        throw error
     }
     
     if(!decodedToken){
-        req.isAuth = false
-        return next()
+        const error = new Error('Not Authenticated');
+        error.code=401;
+        throw error
     }
     const user = User.findById(decodedToken.userId);
     if(!user.validToken&&decodedToken){
-        req.isAuth = false
-        return next()
+        const error = new Error('Not Authenticated');
+        error.code=401;
+        throw error
     }
+    console.log('OKKK')
     req.isAuth = true
     req.userId = decodedToken.userId
     next()

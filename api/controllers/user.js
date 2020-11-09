@@ -2,6 +2,7 @@
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const User = require('../models/user')
+const {signupInputs} = require('./inputs/account')
 
 
 
@@ -19,7 +20,10 @@ exports.getUser = async (req, res, next) => {
     }
 
     const data= {
-        ...user._doc,
+        userName:user.userName,
+        authority:user.authority,
+        status:user.status,
+        avatar:user.avatar,
         createdAt:user.createdAt.toISOString(),
         updatedAt:user.updatedAt.toISOString()
     }
@@ -67,35 +71,20 @@ exports.updateUser = async (req, res, next) => {
     const password = req.body.password;
     const avatar = req.body.avatar
     const authority = req.body.authority;
-    const userId = req.body.userId;
+    const userId = req.userId;
 
-    const userNameErrors = [];
-    const passwordErrors=[];
-    const arrayErrors=[];
-    
-    
-    if(userName.match('[!@#$%^&*(),.?":{}|<>]')){
-        userNameErrors.push("special characters are not allowed on the user name")
-    }
-    if(validator.isLength(userName,{min:4})){
-        userNameErrors.push("invalid user! minimum 4 letters are allowed")
-    }
+    const {userNameProperties,passwordProperties,oldPasswordProperties} = signupInputs;
 
-    if(validator.isLength(password,{min:6})){
-        passwordErrors.push("invalid password value! minimum lenght is 6 charactere");
-    }
+    const isError = [
+        await validate(userName,userNameProperties),
+        await validate(password,oldPasswordProperties),
+        await validate(password,passwordProperties),
+    ].filter(e=>e!==true);
 
-    if(passwordErrors.length){
-        arrayErrors.push({passwordError:passwordErrors[0]})
-    }
-    if(userNameErrors.length){
-        arrayErrors.push({userNameError:userNameErrors[0]})
-    }
-
-    if(arrayErrors.length){
+    if(isError){
         return res.status(500).json({
-            errors:arrayErrors,
-            message:'Invalid input'
+            errors:isError,
+            message:'Invalid Input!'
         })
     }
 
@@ -135,14 +124,16 @@ exports.updateUser = async (req, res, next) => {
 
 //! ----- DELETE A USER ----------
 exports.deleteUser = async (req, res, next) => {
-    const userId = req.body.userId;
+    const userId = req.userId;
     const currentUserId = req.body.currentUserId
-    
 
     const currentUser = await User.findOne({_id:currentUserId})
     
     if(currentUser.authority=='ADMIN'){
         const user = await User.findById(userId);
+        if(userId===currentUserId){
+            user.validToken =false;
+        }
         user.status = false;
         const deletedUser = await user.save();
 

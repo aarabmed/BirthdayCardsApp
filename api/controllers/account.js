@@ -2,35 +2,26 @@ require('dotenv').config();
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const User = require('../models/user')
-
+const User = require('../models/user');
+const {loginInputs, signupInputs} = require('./inputs/account')
+const validate = require('../utils/inputErrors');
 
 //! ----- LOGIN A USER ----------
 exports.userLogin = async (req, res, next) => {
     const userName = req.body.userName;
     const password = req.body.password;
-    const userNameErrors = [];
-    const passwordErrors=[];
-    const arrayErrors=[];
+    const {userNameProperties,passwordProperties} = loginInputs
 
-    if(validator.isEmpty(userName,{ignore_whitespace:true})){
-        userNameErrors.push("Enter your user Name");
-    }
-    if(validator.isEmpty(password,{ignore_whitespace:true})){
-        passwordErrors.push("Enter your password");
-    }
 
-    if(passwordErrors.length){
-        arrayErrors.push({passwordError:passwordErrors[0]})
-    }
+    const isError = [
+        await validate(userName,userNameProperties),
+        await validate(password,passwordProperties),
+    ].filter(e=>e!==true);
 
-    if(userNameErrors.length){
-        arrayErrors.push({userNameError:userNameErrors[0]})
-    }
 
-    if(arrayErrors.length){
+    if(isError){
         return res.status(500).json({
-            errors:arrayErrors,
+            errors:isError,
             message:'Invalid Input!'
         })
     }
@@ -94,33 +85,18 @@ exports.userLogout = async (req, res, next) => {
 exports.createUser = async (req, res, next) => {
     const userName = req.body.userName;
     const password = req.body.password;
-    const userNameErrors = [];
-    const passwordErrors=[];
-    const arrayErrors=[];
-  
-    if(!validator.isLength(userName,{min:4})){
-        userNameErrors.push("user name is very short! minimum 4 letters are allowed")
-    }
-    if(userName.match('[!@#$%^&*(),.?":{}|<>]')){
-        userNameErrors.push("special characters are not allowed on the user name")
-    }
+    const {userNameProperties,passwordProperties} = signupInputs
+    
+    const isError = [
+        await validate(userName,userNameProperties),
+        await validate(password,passwordProperties),
+    ].filter(e=>e!==true);
 
 
-    if(!validator.isLength(password,{min:6})){
-        passwordErrors.push("password is very weak! minimum lenght is 6 charactere");
-    }
-
-    if(passwordErrors.length){
-        arrayErrors.push({passwordError:passwordErrors[0]})
-    }
-    if(userNameErrors.length){
-        arrayErrors.push({userNameError:userNameErrors[0]})
-    }
-
-    if(arrayErrors.length){
+    if(isError){
         return res.status(500).json({
-            errors:arrayErrors,
-            message:'Invalid input'
+            errors:isError,
+            message:'Invalid Input!'
         })
     }
 

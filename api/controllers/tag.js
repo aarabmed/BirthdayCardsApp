@@ -2,7 +2,8 @@
 const validator = require('validator');
 const Tag = require('../models/tag');
 const User = require('../models/user');
-
+const validate = require('../utils/inputErrors');
+const {nameProperties} = require('./inputs/tag')
 //! ----- RETRIEVE A SINGLE TAG ----------
 /* exports.getTag = async (req, res, next) => {
 
@@ -27,25 +28,14 @@ exports.getAllTags = async (req, res, next) => {
 //! ----- CREATE A NEW TAG ----------
 exports.createTag = async (req, res, next) => {
     const name = req.body.name
-    const nameErrors =[];
-    const errorsArray =[]
-    const regex = /^[A-Za]+$/
-
-    
-    if(!validator.isLength(name,{min:5})){
-        nameErrors.push("Tag name minimum lenght is 5 characters");
-    }
-    if(regex.test(name)){
-        nameErrors.push("Tag name takes only alphabets");
-    }
-
-
-    if(nameErrors.length){
-        errorsArray.push({name:nameErrors[0]})
-    }
     
 
-    if(errorsArray.length){
+    const isError = [
+        await validate(name,nameProperties),
+    ].filter(e=>e!==true);
+
+
+    if(isError){
         return res.status(500).json({
             errors:errorsArray,
             message:"Invalid Input!",
@@ -80,25 +70,12 @@ exports.updateTag = async (req, res, next) => {
     const tagId = req.body.tagId
     const name = req.body.name
     
-    const nameErrors =[];
-    const errorsArray =[]
-    const regex = /^[A-Za]+$/
-
-    
-    if(!validator.isLength(name,{min:5})){
-        nameErrors.push("Tag name minimum lenght is 5 characters");
-    }
-    if(regex.test(name)){
-        nameErrors.push("Tag name takes only alphabets");
-    }
+    const isError = [
+        await validate(name,nameProperties),
+    ].filter(e=>e!==true);
 
 
-    if(nameErrors.length){
-        errorsArray.push({name:nameErrors[0]})
-    }
-    
-
-    if(errorsArray.length){
+    if(isError){
         return res.status(500).json({
             errors:errorsArray,
             message:"Invalid Input!",
@@ -132,8 +109,7 @@ exports.updateTag = async (req, res, next) => {
 //! ----- DELETE A TAG ----------
 exports.deleteTag = async (req, res, next) => {
     const tagId = req.body.tagId;
-    const currentUserId = req.body.currentUserId
-    
+    const currentUserId = req.userId
 
     const currentUser = await User.findById(currentUserId)
     if(currentUser.authority=='ADMIN'){
