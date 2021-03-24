@@ -1,9 +1,10 @@
-const validator = require('validator');
-const multer = require('multer');
-const Category = require('../models/category');
-const User = require('../models/user');
-const validate = require('../utils/inputErrors');
-const {nameProperties,descriptionProperties,imageProperties} = require('./inputs/category')
+
+const {Category} = require('../../models/category');
+const User = require('../../models/user');
+const validate = require('../../utils/inputErrors');
+const {authorities}= require('../../utils/authority')
+
+const {nameProperties,titleProperties,descriptionProperties,imageProperties,slugProperties} = require('../inputs/category')
 
 //! ----- RETRIEVE A SINGLE CATEGORY ----------
 /* exports.getCategory = async (req, res, next) => {
@@ -12,7 +13,15 @@ const {nameProperties,descriptionProperties,imageProperties} = require('./inputs
 
 //! ----- RETRIEVE ALL CATEGORIES ----------
 exports.getAllCategories = async (req, res, next) => {
-    const categories = await Category.find();
+    const categories = await Category.find()
+        .populate([
+            {path:"subCategory",select:"tags name -_id",
+                populate:{
+                    path:"children",
+                    select:"tags"
+                }
+            }
+        ]);
     if(!categories){
         return res.status(404).json({
             data:[],
@@ -29,41 +38,54 @@ exports.getAllCategories = async (req, res, next) => {
 
 //! ----- CREATE A NEW CATEGORY ----------
 exports.createCategory = async (req, res, next) => {
-    
+    const currentUserId=req.body.currentUserId
+    const title = req.body.title
     const name = req.body.name
+    const slug = req.body.slug
     const description = req.body.description
+    const subCategory = req.body.subCategory??[]
     const categoryImage = req.file
+
     
     
     const isError = [
         await validate(name,nameProperties),
+        await validate(title,titleProperties),
+        await validate(slug,slugProperties),
         await validate(description,descriptionProperties),
         await validate(categoryImage,imageProperties),
     ].filter(e=>e!==true);
 
     if(isError.length){
         return res.status(500).json({
-            errors:errorsArray,
+            errors:isError,
             message:"Invalid Input!",
         })
     }
 
     const newImage ={
         imageName: categoryImage.filename,
-        path:categoryImage.path,
+        path:categoryImage.path.replace(/\\/g,'/'),
         destination:categoryImage.destination,
         mimetype:categoryImage.mimetype
     }
     
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    const newName= name.split(' ').map(capitalize).join(' ');
+    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newTitle= title.split(' ').map(capitalize).join(' ');
 
-    const newName= name.charAt(0).toUpperCase()+name.slice(1).toLowerCase();
-    
     const category = await new Category({
+        title:newTitle,
         name:newName,
         description,
         image:newImage,
         status:true,
-        slug:name.toLowerCase()
+        slug:newSlug,
+        subCategory,
+        createdBy:currentUserId
     })
 
     const savedCategory  = await category.save();
@@ -73,6 +95,9 @@ exports.createCategory = async (req, res, next) => {
             message:'Server failed to save the new category'
         })
     }
+
+    ///await SubCategory.updateMany({_id:subCategory},{$push:{"category":savedCategory._id}})
+    
     return res.status(201).json({
         data:savedCategory,
         message:'Category saved successfully'
@@ -83,30 +108,35 @@ exports.createCategory = async (req, res, next) => {
 
 //! ----- EDIT A CATEGORY ----------
 exports.updateCategory = async (req, res, next) => {
+    const currentUserId=req.body.currentUserId
     const categoryId = req.body.categoryId;
+    const title = req.body.title
     const name = req.body.name;
+    const slug = req.body.slug
     const description = req.body.description;
-    const categoryImage = req.body.categoryImage;
+    const categoryImage = req.file;
+    const subCategory = req.body.subCategory??[]
 
     const isError = [
         await validate(name,nameProperties),
+        await validate(title,titleProperties),
+        await validate(slug,slugProperties),
         await validate(description,descriptionProperties),
-        await validate(categoryImage,imageProperties),
     ].filter(e=>e!==true);
 
     if(isError.length){
         return res.status(500).json({
-            errors:errorsArray,
+            errors:isError,
             message:"Invalid Input!",
         })
     }
 
     
     const newImage ={
-        imageName: categoryImage.filename,
-        path:categoryImage.path,
-        destination:categoryImage.destination,
-        mimetype:categoryImage.mimetype
+        imageName: categoryImage && categoryImage.filename,
+        path:categoryImage && categoryImage.path.replace(/\\/g,'/'),
+        destination:categoryImage && categoryImage.destination,
+        mimetype:categoryImage && categoryImage.mimetype
     }
     
     const category = await Category.findOne({_id:categoryId})
@@ -118,13 +148,25 @@ exports.updateCategory = async (req, res, next) => {
         })
     }
     
+    
 
-    const newName= name.charAt(0).toUpperCase()+name.slice(1).toLowerCase();
+    // const removedSubCategory = category.subCategory.filter(t=>!subCategory.includes(t))
+    // const newSubCategory = subCategory.filter(t=>!category.subCategory.includes(ObjectID(t)))
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    const newName= name.split(' ').map(capitalize).join(' ');
+    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newTitle= title.split(' ').map(capitalize).join(' ');
 
     category.name = newName;
+    category.title = newTitle;
     category.description = description;
-    category.image = newImage;
-    category.slug = name.toLowerCase();
+    category.slug = newSlug;
+    categoryImage && (category.image = newImage);
+    category.subCategory = subCategory;
+    category.updatedBy=currentUserId;
 
 
 
@@ -134,6 +176,11 @@ exports.updateCategory = async (req, res, next) => {
             message:'Error while editing the category'
         })
     }
+
+
+    /* removedSubCategory.length && await SubCategory.updateMany({_id:removedSubCategory},{$pull:{"category":updatedCategory._id}})
+    newSubCategory.length && await SubCategory.updateMany({_id:newSubCategory},{$push:{"category":updatedCategory._id}})
+ */
     return res.status(201).json({
         data:updatedCategory,
         message:'Category updated successfully'
@@ -149,7 +196,7 @@ exports.deleteCategory = async (req, res, next) => {
 
     const currentUser = await User.findById(currentUserId)
 
-    if(currentUser.authority=='ADMIN'){
+    if(authorities.includes(currentUser.authority)){
         const category = await Category.findOne({_id:categoryId})
 
         if(!category){
@@ -160,6 +207,7 @@ exports.deleteCategory = async (req, res, next) => {
         }
 
         category.status = false;
+        category.deletedBy=currentUserId
         const deletedCategory  = await category.save();
         
         if(!deletedCategory){

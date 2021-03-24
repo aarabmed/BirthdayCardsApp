@@ -1,0 +1,53 @@
+.content {
+  padding-top: remCal(150);
+  @include mq(md) {
+    padding-top: remCal(150);
+  }
+  &.clear-top {
+    padding-top: remCal(120);
+    @include mq(md) {
+      padding-top: remCal(50);
+    }
+  }
+}
+
+.content-admin {
+  height: 100%;
+  //padding-top: remCal(70);
+  /* @include mq(md) {
+    padding-top: remCal(70);
+  } */
+  &.clear-top {
+    padding-top: remCal(120);
+    @include mq(md) {
+      padding-top: remCal(50);
+    }
+  }
+}
+
+.content-side{
+  padding: 1rem 1rem 1rem 1rem;
+  overflow: auto;
+  
+}
+
+.content-page{
+  //height: 100%;
+  width: 98%;
+}
+.main-content-page{
+  width: 100%;
+  min-height: 100%;;
+}
+
+.spinner{
+  text-align: center;
+  top: 50px;
+  position: relative;
+}
+
+.contentTitle{
+  font-weight: bold;
+  font-size: 2rem;
+  color: dimgray;
+}

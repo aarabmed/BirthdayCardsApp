@@ -14,7 +14,41 @@ const tagSchema = new Schema({
     status:{
         type:Boolean,
         required:true
-    }
+    },
+    deleted:{
+        type:Boolean,
+        required:true
+    },
+    statusUpdatedBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
+    deletedBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
+    updatedBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
+    card:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:'Card'
+        }
+    ],
+    subCategory:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:'SubCategory'
+        }
+    ],
+    childrenSubCategory:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:'SubCategoryChild'
+        }
+    ]
 },{timestamps: true})
 
 module.exports = mongoose.model('Tag',tagSchema)

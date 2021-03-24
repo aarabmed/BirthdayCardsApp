@@ -7,7 +7,37 @@ module.exports={
                 isEmpty:false
             },
             {
+                isLength:{min:3}
+            }
+            ,
+            {
+                isAlphabets:true,
+            },
+        ]
+    },
+    titleProperties:{
+        inputName:'title',
+        validation:[
+            {
+                isEmpty:false
+            },
+            {
                 isLength:{min:5}
+            }
+            ,
+            {
+                isAlphabets:true,
+            },
+        ]
+    },
+    slugProperties:{
+        inputName:'slug',
+        validation:[
+            {
+                isEmpty:false
+            },
+            {
+                isLength:{min:3}
             }
             ,
             {

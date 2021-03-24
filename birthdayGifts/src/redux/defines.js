@@ -1,0 +1,12 @@
+export const GLOBAL = {
+  SET_LANGUAGE: "SET_LANGUAGE",
+  SET_SEARCH: "SET_SEARCH",
+  SET_ROUTE: "SET_ROUTE",
+};
+
+
+export const USER = {
+  SET_USER: "SET_USER",
+  REMOVE_USER: "REMOVE_USER",
+};
+

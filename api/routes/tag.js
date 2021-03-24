@@ -10,7 +10,7 @@ router.get("/", getAllTags);
 
 router.post("/new",checkAuth, createTag);
 
-router.patch("/:tagId",checkAuth, updateTag);
+router.patch("/:tagId",checkAuth,checkAuth, updateTag);
 
 router.post("/:tagId",checkAuth, deleteTag);
 

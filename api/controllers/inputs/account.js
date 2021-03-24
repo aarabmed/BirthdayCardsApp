@@ -16,7 +16,17 @@ exports.loginInputs ={
             }
         ]
     },
+    emailProperties:{
+        inputName:'email',
+        validation:[
+            {
+                isEmail:true
+            }
+        ]
+    }
 }
+
+
 
 exports.signupInputs ={
     userNameProperties:{
@@ -41,6 +51,14 @@ exports.signupInputs ={
             },
             {
                 isLength:{min:8}
+            }
+        ]
+    },
+    emailProperties:{
+        inputName:'email',
+        validation:[
+            {
+                isEmail:true
             }
         ]
     },

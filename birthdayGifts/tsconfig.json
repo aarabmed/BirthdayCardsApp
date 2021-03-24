@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "assets/*": ["./assets/icons*"],
+      "@/*": ["./*"]
+    },
+    "baseUrl": "src",
+    "target": "esnext",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "esnext.asynciterable",
+      "esnext.intl",
+      "es2017.intl",
+      "es2018.intl" 
+    ],
+    "allowJs": true,
+    "typeRoots": ["./src/@types", "./node_modules/@types"],
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve"
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "./src/**/*",
+    ],
+  "exclude": [
+    "node_modules"
+  ]
+}

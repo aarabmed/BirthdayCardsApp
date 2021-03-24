@@ -2,23 +2,23 @@ const validator = require('validator');
 
 module.exports = async (value,properties)=>{
     const input = !value?'':value;
- 
+   // console.log("input:",value);
     let results;
     const { inputName, validation} = properties
     validation.forEach(prop => {
-        const { isLength ,isEmpty, isMatch, isAlphabets, isBoolean, isImage} = prop
+        const { isLength ,isEmpty, isMatch, isAlphabets, isBoolean, isImage,isEmail} = prop
         if(isLength){
             let min = isLength.min?isLength.min:undefined;
             let max = isLength.max?isLength.max:undefined; 
             if(!validator.isLength(input,{min:min,max:max})){
                 if(min&&max){
-                    return results=({[inputName]:`${inputName} value length must be between ${min} and ${max} characters`});
+                    return results=({[inputName]:`${inputName} length must be between ${min} and ${max} characters`});
                 } 
                 if(min){
-                    return results=({[inputName]:`${inputName} value length must be at least ${min===1? min+' character.': min+'characters'}`});
+                    return results=({[inputName]:`${inputName} length must be at least ${min===1? min+' character.': min+' characters'}`});
                 }
                 if(max){
-                    return results=({[inputName]:`${inputName} value max length is ${min===1? min+' character.': min+'characters'}`});
+                    return results=({[inputName]:`${inputName}  max length is ${min===1? min+' character.': min+' characters'}`});
                 }
         
             }
@@ -61,6 +61,13 @@ module.exports = async (value,properties)=>{
                 return results = ({
                     [inputName]: `${inputName} input takes only boolean value!`,
                 })
+            }
+        }
+        if(isEmail===true){
+            if(!validator.isEmail(input)){
+                return results = ({
+                    [inputName]: 'input requires a valid E-mail !',
+                }) 
             }
         }
 

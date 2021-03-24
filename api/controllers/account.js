@@ -3,14 +3,18 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const validate = require('../utils/inputErrors');
+
+const {authorities, valideAuthority}= require('../utils/authority')
 const {loginInputs, signupInputs} = require('./inputs/account')
+
+
 
 //! ----- LOGIN A USER ----------
 exports.userLogin = async (req, res, next) => {
     const userName = req.body.userName;
     const password = req.body.password;
-    const {userNameProperties,passwordProperties} = loginInputs
 
+    const {userNameProperties,passwordProperties} = loginInputs
 
     const isError = [
         await validate(userName,userNameProperties),
@@ -27,35 +31,43 @@ exports.userLogin = async (req, res, next) => {
 
     const user = await User.findOne({userName});
     if(!user){
-        return res.status(404).json({
+        return res.json({
             date:[],
-            message:`the user name <<${userName}>> does not exist in the database`
+            status:404,
+            message:`the user name <<${userName}>> does not exist in our database`
         })
     }
 
     const isPasswordValid = await bcrypt.compare(password,user.password);
     
     if(!isPasswordValid){
-        return res.status(401).json({
+        return res.json({
             date:null,
+            status:401,
             message:"invalid password"
         })
     }
 
-    const {authority,_id}= user;
+    const {authority,_id,avatar}= user;
     const userId =_id.toString();
-
-    const token = await jwt.sign({userId,userName},process.env.JWT_SECRETCODE,{expiresIn:'15min'})
+    const token = await jwt.sign({userId,userName},process.env.SECRETCODE,{expiresIn:'60min'})
     user.validToken = true;
     await user.save();
     const data = {
         userId,
         userName,
         token,
-        authority
+        authority,
+        avatar,
+        validToken:true,
     }
-    return res.status(200).json({
+
+    req.session.set("user", { id: 20 });
+    await req.session.save();
+    
+    return res.json({
         data,
+        status:200,
         message:`${userName} is logged in successfully`
     })
 
@@ -132,18 +144,48 @@ exports.updateUserPassword = async (req, res, next) => {
 
 //! ----- CREATE A NEW USER ----------
 exports.createUser = async (req, res, next) => {
+    const userId = req.body.userId??'';
     const userName = req.body.userName;
     const password = req.body.password;
-    const {userNameProperties,passwordProperties} = signupInputs
+    const newAuthority = req.body.role;
+    const email = req.body.email;
+    const avatar = req.body.avatar
+    const {userNameProperties,passwordProperties,emailProperties} = signupInputs
+
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+        const error = {message:"Unauthorised, undefined user"}
+        error.code = 400
+        return res.status(400).json({
+            error
+        })
+    }
+
     
     const isError = [
         await validate(userName,userNameProperties),
         await validate(password,passwordProperties),
+        await validate(email,emailProperties),
     ].filter(e=>e!==true);
+    
+    let { authority } = await User.findById({_id:userId})
 
+    const isAuthorised = authorities.includes(authority)
+    const isValideAuthority = valideAuthority.includes(newAuthority)
+    if(!isValideAuthority){
+        isError.push({authority:`Error !!, authority of type ${newAuthority.toUpperCase()} is invalid`})
+    }
+
+    if(!isAuthorised){
+        isError.push({error:`Unauthoried!!, an account of type ${authority} can not create an account of type ${newAuthority.toUpperCase()}`})
+    }
+
+    if(authority==='ADMIN'&&newAuthority==='SUPER_ADMIN'){
+         isError.push({error:`Unauthoried!!, can not create a SUPER-ADMIN account with an account type ADMIN`})
+    }
 
     if(isError.length){
-        return res.status(500).json({
+        return res.json({
+            status:500,
             errors:isError,
             message:'Invalid Input!'
         })
@@ -154,10 +196,14 @@ exports.createUser = async (req, res, next) => {
     const user = await new User({
         userName,
         password:hashPassword,
-        avatar:'',
-        authority:'ADMIN',
+        avatar:`/assets/avatars/${avatar}.png`,
+        status:true,
+        email,
+        authority:newAuthority.toUpperCase(),
         validToken:false
     })
+
+
 
     const userExisted = await User.findOne({userName});
 
@@ -171,7 +217,10 @@ exports.createUser = async (req, res, next) => {
         userName : createdUser.userName,
         authority: createdUser.authority,
         createdAt: createdUser.createdAt.toISOString(),
-        userId : createdUser.id
+        status:createdUser.status,
+        email:createdUser.email,
+        userId : createdUser.id,
+        avatar:createdUser.avatar
     }
     return res.status(201).json({
         message:'user Created successfully',

@@ -1,0 +1,100 @@
+.avatar-container{
+    background: lightgray;
+    padding: 6px;
+    width: 25%;
+    display: block;
+    cursor: pointer;
+    overflow: auto;
+    &ul{
+        display: flex;
+        &li{
+            list-style: none;
+        }
+    }
+
+}
+
+.myCarousel>div>div>ul>li{
+    border-radius: 20% !important;
+    width: 15px !important;
+    height: 5px !important;
+    margin: 0px 10px !important;
+ } 
+ .myCarousel>div>div>ul{
+    padding: 0px !important;
+ }
+
+ .LeftArrow{
+    position: absolute;
+    top: 60px;
+   
+    padding: 11px 1px;
+    z-index: 1000000;
+    opacity: 1;
+   }
+
+  
+
+   .LeftArrow:hover{
+    opacity: 0.7;
+    background: #fff;
+   }
+
+   .RightArrow{
+    position: absolute;
+    top: 60px;
+    right: 0px;
+    
+    padding: 11px 1px;
+    z-index: 1000000;
+    opacity: 1;
+   }
+
+   .RightArrow:hover{
+    background: #fff;
+    opacity: 0.7;
+   }
+   .carousel .slide {
+    background: unset !important;
+    }
+    
+    .slide > div {
+        opacity: 0.7;
+    }
+    
+    .active>.anticon{
+        position:absolute;
+        z-index: 100000000;
+    }
+
+    .avatarList {
+        display: flex;
+        flex-wrap: wrap;
+        width: 350px;
+        
+    }
+    .singleAvatar {
+        margin: 5px 7px;
+        opacity: 0.7;
+    }
+
+    .singleAvatar> img{
+        width: 50px;
+        margin: 2px;
+    }
+
+    .active>img{
+        width: 50px;
+        margin: 2px;
+    }
+
+    .avatar-close-button{
+        margin-top: 12px;
+    }
+
+    .singleAvatar > .active {
+        border: 3px double #02dc6b;
+        opacity: 1;
+        border-radius: 3px;
+        width: max-content;
+    }

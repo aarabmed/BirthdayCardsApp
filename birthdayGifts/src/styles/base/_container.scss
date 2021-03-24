@@ -1,0 +1,29 @@
+.container {
+  max-width: 100%;//$container;
+  margin-left: 0px;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+  overflow: hidden;
+}
+
+.container-admin{
+  padding: 0px !important;
+  height: 100%;
+  &>div{
+    height: 100%;
+  }
+}
+
+
+.container-fluid {
+  max-width: $container-fluid;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 30px;
+  padding-right: 30px;
+  @include mq(lg) {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}

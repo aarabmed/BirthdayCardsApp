@@ -1,13 +1,14 @@
-
-const multer = require('multer');
 const ObjectID = require('mongodb').ObjectID
 const Card  =  require('../models/card');
-const Category  =  require('../models/category');
+const {Category,SubCategory,SubCategoryChild}  =  require('../models/category');
 const User = require('../models/user');
+const Tag = require('../models/tag');
 const validate = require('../utils/inputErrors')
 const isBoolean = require('../utils/toBoolean');
 const {getPagination} = require('../utils/getPagination');
-const {titleProps,descProps,cardImageProps,cardSizeProps,statusProps} = require('./inputs/card');
+const {authorities}= require('../utils/authority')
+
+const {titleProps,descProps,cardImageProps,cardSizeProps,statusProps,slugProperties} = require('./inputs/card');
 
 //! ----- RETRIEVE A SINGLE CARD ----------
 exports.getCard = async (req, res, next) => {
@@ -45,35 +46,60 @@ exports.getAllCards = async (req, res, next) => {
 
 //! ----- CREATE A CARD ----------
 exports.createCard = async (req, res, next) => {
+    const currentUserId = req.body.currentUserId
     const title = req.body.title;
+    const slug = req.body.slug
     const description = req.body.description;
     const categoryId = req.body.category;
     const tags = req.body.tags;
     const cardImage = req.file;
     const cardSize = req.body.cardSize;
     const status = isBoolean(req.body.status);
+    const subCategoryId = req.body.subCategory;
+    const subCategoryChildId = req.body.subCategoryChild
     let isError = [];
     
    
-    const newCategory = await Category.findById(categoryId);
-    if(!newCategory){
-        isError.push({category:'Category is not valid'})
+    
+    if(categoryId){
+        const newCategory = await Category.findById(categoryId);
+
+        if(!newCategory){
+            isError.push({category:'Category is not valid'})
+        }
+    }
+
+    
+    if(subCategoryId){
+        const subCategory = await SubCategory.findById(subCategoryId);
+
+        if(!subCategory){
+            isError.push({subCategory:'Sub Category is not valid'})
+        }
+    }
+
+    if(subCategoryChildId){
+        const subCategoryChild = await SubCategoryChild.findById(subCategoryChildId);
+
+        if(!subCategoryChild){
+            isError.push({subCategoryChild:'Sub Category child is not valid'})
+        }
     }
 
     const newImage ={
         imageName: cardImage.filename,
-        path:cardImage.path,
+        path:cardImage.path.replace(/\\/g,'/'),
         destination:cardImage.destination,
         mimetype:cardImage.mimetype
     }
     
-
+    
     isError = [
         ...isError,
         await validate(title,titleProps),
-        await validate(description,descProps),
         await validate(cardImage,cardImageProps),
         await validate(cardSize,cardSizeProps),
+        await validate(slug,slugProperties),
         await validate(status,statusProps),
     ].filter(e=>e!==true);
 
@@ -86,17 +112,25 @@ exports.createCard = async (req, res, next) => {
         })
     }
 
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    const newTitle= title.split(' ').map(capitalize).join(' ');
+    const newSlug= slug.split(' ').join('-').toLowerCase();
     
     const card = new Card({
-        title:title,
-        slug:title.split('-')[0].trim().toLowerCase().replace(/ /g,'-'),
+        title:newTitle,
+        slug:newSlug,
         description:description,
-        category:ObjectID(categoryId),
-        tags:tags.map(t=>(ObjectID(t.key))),
+        category:categoryId,
+        tags:tags,
         image:newImage,
         cardSize:cardSize,
         status:status,
+        subCategory:subCategoryId,
+        subCategoryChild:subCategoryChildId,
         deleted:false,
+        createdBy:currentUserId
     })
 
     const savedCard = await card.save();
@@ -113,28 +147,50 @@ exports.createCard = async (req, res, next) => {
 
 //! ----- EDIT A CARD ----------
 exports.updateCard = async (req, res, next) => {
-    const cardId= req.body.cardId
+    const currentUserId=req.body.currentUserId
+    const cardId= req.params.id
     const title = req.body.title;
+    const slug = req.body.slug
     const description = req.body.description;
     const categoryId = req.body.category;
-    const tags = req.body.tags;
+    const subCategoryId = req.body.subCategory;
+    const subCategoryChildId = req.body.subCategoryChild;
+    const tags = req.body.tags??[];
     const cardImage = req.file;
     const cardSize = req.body.cardSize;
     const status = isBoolean(req.body.status);
     let isError = []
 
+    if(categoryId){
+        const newCategory = await Category.findById(categoryId);
 
-    const newCategory = await Category.findById(categoryId);
-    if(!newCategory){
-        isError.push({category:'Category is not valid'})
+        if(!newCategory){
+            isError.push({category:'Category is not valid'})
+        }
     }
+
+    if(subCategoryId){
+        const subCategory = await SubCategory.findById(subCategoryId);
+
+        if(!subCategory){
+            isError.push({subCategory:'Sub Category is not valid'})
+        }
+    }
+
+    if(subCategoryChildId){
+        const subCategoryChild = await SubCategoryChild.findById(subCategoryChildId);
+
+        if(!subCategoryChild){
+            isError.push({subCategoryChild:'Sub Category child is not valid'})
+        }
+    }
+    
 
     
     isError = [
         ...isError,
         await validate(title,titleProps),
-        await validate(description,descProps),
-        await validate(cardImage,cardImageProps),
+        await validate(slug,slugProperties),
         await validate(cardSize,cardSizeProps),
         await validate(status,statusProps),
     ].filter(e=>e!==true);
@@ -148,10 +204,10 @@ exports.updateCard = async (req, res, next) => {
 
 
     const newImage ={
-        imageName: cardImage.filename,
-        path:cardImage.path,
-        destination:cardImage.destination,
-        mimetype:cardImage.mimetype
+        imageName: cardImage && cardImage.filename,
+        path: cardImage && cardImage.path.replace(/\\/g,'/'),
+        destination: cardImage && cardImage.destination,
+        mimetype: cardImage && cardImage.mimetype
     }
 
     
@@ -162,16 +218,34 @@ exports.updateCard = async (req, res, next) => {
         })
     }
 
-    card.title = title;
-    card.slug = title.split('-')[0].trim().toLowerCase().replace(/ /g,'-');
+    const removedTags = card.tags.filter(t=>!tags.includes(t.toString()))
+
+    const newTags = tags.filter(t=>!card.tags.includes(ObjectID(t)))
+
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    const newTitle= title.split(' ').map(capitalize).join(' ');
+    const newSlug= slug.split(' ').join('-').toLowerCase();
+
+    card.title = newTitle;
+    card.slug = newSlug;
     card.description = description;
-    card.category = ObjectID(categoryId);
-    card.tags = tags.map(t=>(ObjectID(t.key)));
-    card.image = newImage;
+    card.category = categoryId =='' ? undefined:categoryId ;
+    card.subCategory = subCategoryId =='' ?undefined:subCategoryId;
+    card.subCategoryChild = subCategoryChildId =='' ?undefined:subCategoryChildId
+    card.tags = tags;
+    cardImage && (card.image = newImage);
     card.cardSize = cardSize;
     card.status = status;
+    card.updatedBy= currentUserId
 
     const updatedCard = await card.save()
+
+    removedTags.length && await Tag.updateMany({_id:removedTags},{$pull:{"card":updatedCard._id}})
+    newTags.length && await Tag.updateMany({_id:newTags},{$push:{"card":updatedCard._id}})
+
 
     if(updatedCard){
         return res.status(201).json({
@@ -188,11 +262,11 @@ exports.updateCard = async (req, res, next) => {
 //! ----- DELETE A CARD ----------
 exports.deleteCard = async (req, res, next) => {
     const currentUserId = req.currentUserId;
-    const cardId = req.body.cardId;
+    const cardId = req.cardId;
 
     const currentUser = await User.findById(currentUserId)
-    if(currentUser.authority=='ADMIN'){
-        const card = await Card.findByIdAndUpdate({_id:cardId},{deleted:true})
+    if(authorities.includes(currentUser.authority)){
+        const card = await Card.findByIdAndUpdate({_id:cardId},{deleted:true,deletedBy:currentUser._id})
         if(!card){
             return res.status(500).json({
                 message:'Error while deleting the card'

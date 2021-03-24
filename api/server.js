@@ -17,5 +17,6 @@ mongoose.connect(databaseUrl, {useUnifiedTopology: true,useNewUrlParser: true , 
     })
 }).catch(err=>{
     console.log('Error while connecting to database:',err)
+    //process.exit(1);
 })
 

@@ -1,23 +1,54 @@
 const multer = require('multer');
-const Category = require('../models/category');
+const fs = require('fs')
+const {Category,SubCategoryChild,SubCategory} = require('../models/category');
 const Card = require('../models/card')
 
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb)=>{
-        if(file.fieldname === 'cardImage'){
-            return cb(null,'images/cards')
+
+        const folder = file.fieldname.replace('Image','');
+        const path=`./images/${folder}`
+        if(!fs.existsSync(path)){
+            fs.mkdirSync(path)
         }
-        cb(null,'images/categories')
+         switch (file.fieldname) {
+            case ('cardImage'):
+                cb(null,'images/card');
+                break;
+            case ('categoryImage'):
+                 cb(null,'images/category')
+                 break;
+            case ('subCategoryChildImage'):
+                 cb(null,'images/subCategoryChild')
+                 break;
+            case ('subCategoryImage'):
+                 cb(null,'images/subCategory')
+                 break;
+            default:
+                cb(null,'images/other')
+        }
     },
     filename:async (req, file, cb)=>{
         let imageNumber;
         let recentItem = false;
-        if(file.fieldname === 'cardImage')
-            recentItem = await Card.find().sort({"_id" : -1}).limit(1);
-        else{
-            recentItem = await Category.find().sort({"_id" : -1}).limit(1);
+        
+        switch (file.fieldname) {
+            case ('cardImage'):
+                 recentItem = await Card.find().sort({"_id" : -1}).limit(1);
+                 break;
+            case ('categoryImage'):
+                 recentItem = await Category.find().sort({"_id" : -1}).limit(1);
+                 break;
+            case ('subCategoryChildImage'):
+                 recentItem = await SubCategoryChild.find().sort({"_id" : -1}).limit(1);
+                 break;
+            case ('subCategoryImage'):
+                 recentItem = await SubCategory.find().sort({"_id" : -1}).limit(1);
+                 break;
+            default:
+                break
         }
-
+        
         
         if(recentItem.length){
             const index = recentItem[0].image.imageName.split('.')[0].split('-')[1];

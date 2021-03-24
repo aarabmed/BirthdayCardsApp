@@ -18,6 +18,14 @@ const cardSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'Category'
     },
+    subCategory:{
+        type:Schema.Types.ObjectId,
+        ref:'SubCategory'
+    },
+    subCategoryChild:{
+        type:Schema.Types.ObjectId,
+        ref:'ChildrenSubCategory'
+    },
     tags:[{
         type:Schema.Types.ObjectId,
         ref:'Tag'
@@ -36,6 +44,18 @@ const cardSchema = new Schema({
     deleted:{
         type:Boolean,
         required:true
+    },
+    createdBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
+    deletedBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
+    updatedBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
     }
 },{timestamps: true})
 

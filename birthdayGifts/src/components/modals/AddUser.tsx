@@ -1,0 +1,183 @@
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useSelector, useDispatch } from "react-redux";
+
+import { Modal, Button,Form,
+    Input,
+    Select,
+} from "antd";
+import AvatarInput from './components/avatarInput';
+import axios from 'axios'
+import {withAuth} from '../../context/helper'
+
+
+ const addUser = ({fetching}) => {
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+  
+    const {currentUser} = useSelector((state) => state.userReducer);
+    const {authority,userId} = currentUser
+
+    const [form] = Form.useForm();
+    
+    const router = useRouter();
+
+    const showModal = () => {
+        withAuth(setIsModalVisible(true))
+    };
+
+    const refreshData = () => {
+        router.replace(router.asPath);
+        fetching()
+    }
+
+    const AvatarValue = (avatar) =>{
+        form.setFieldsValue({['avatar']:avatar})
+    }
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+        setConfirmLoading(false);
+        form.resetFields();
+    };
+    
+
+    const onCreate = (values) => { 
+        setConfirmLoading(true);
+        const data = {...values,userId}
+  
+        axios({
+            url:'/api/account/signup',
+            data,
+            method:'post',
+            validateStatus: (status) =>{
+                return true
+            }
+        }).then(res=>{
+            if (res.status===201) {
+                setIsModalVisible(false);
+                setConfirmLoading(false);
+                form.resetFields();
+                refreshData();
+            }else{
+                setConfirmLoading(false);
+            }
+        }).catch(e=>{
+            console.log('Error:',e)
+        })
+        
+    };
+
+    const onOk = () => {
+        form
+          .validateFields()
+          .then((values) => {
+             onCreate(values);
+          })
+          .catch((info) => {
+            console.log('Form errors', info);
+          });
+    }
+
+    const options =()=>{
+        switch (authority) {
+            case 'ADMIN':
+                ( 
+                <Select>
+                    <Select.Option value="ADMIN">ADMIN</Select.Option>
+                    <Select.Option value="USER">USER</Select.Option>
+                </Select>
+                )
+                break;
+            case 'SUPER-ADMIN':
+                <Select>
+                    <Select.Option value="SUPER_ADMIN">SUPER ADMIN</Select.Option>
+                    <Select.Option value="ADMIN">ADMIN</Select.Option>
+                    <Select.Option value="USER">USER</Select.Option>
+                </Select>
+                break;
+            default:
+                break;
+        }
+    }
+      
+  return (
+    <>
+      <Button type="primary" onClick={showModal}>Add a user</Button>
+      <Modal confirmLoading={confirmLoading} visible={isModalVisible} onOk={onOk} onCancel={handleCancel} width={670} title={'Create new user'}>
+        <div className='user-modal-container'>
+          <div className='user-modal-content'>
+            <Form
+            className={'user-form'}
+            labelCol={{
+                span: 4,
+            }}
+            wrapperCol={{
+                span: 14,
+            }}
+            layout="horizontal"
+            size='middle'
+            form={form}
+            name="register"
+
+            >
+                <Form.Item
+                    name="userName"
+                    label={'Username'}
+                    rules={[{ required: true, message: 'Please input your Username !'}]}
+                >
+                    <Input/>
+                </Form.Item>
+
+                <Form.Item
+                    name="email"
+                    label="E-mail"
+                    rules={[
+                    {
+                        type: 'email',
+                        message: 'The input is not valid E-mail!',
+                    },
+                    {
+                        required: true,
+                        message: 'Please input your E-mail!',
+                    },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    name="password"
+                    label="Password"
+                    rules={[
+                    {
+                        required: true,
+                        message: 'Please input your password!',
+                    },
+                    ]}
+                    hasFeedback
+                >
+                    <Input.Password />
+                </Form.Item>
+                <Form.Item 
+                    label="Role" 
+                    name="role" 
+                    rules={[
+                        { required: true, message: 'Please select an account role!' },
+                    ]}>
+                    {options}
+                </Form.Item>
+                <Form.Item
+                    name="avatar"
+                    label={'Avatar'}
+                >
+                    <AvatarInput getAvatarValue={AvatarValue}/>
+                </Form.Item>
+            </Form>
+          </div>
+        </div>
+      </Modal>
+    </>
+  );
+}
+
+export default React.memo(addUser)

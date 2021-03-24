@@ -1,0 +1,118 @@
+.header{
+  background: #fff;
+  width: 100%;
+  box-shadow: #d2d7e8 0px 1px 7px 0px;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 12px;
+  position: sticky;
+z-index: 1;
+}
+
+.head{
+  &-rightSide{
+    display: flex;
+    float: right;
+    overflow: hidden;
+  }
+  &-leftSide{
+    align-self: center;
+  }
+}
+
+.SubMenuLang>.ant-menu-submenu-title{
+  display: flex;
+}
+.SubMenuLang>.ant-menu-submenu-title>.anticon{
+  width: 25px;
+  align-self: center;
+}
+
+.ant-menu-sub>.ant-menu-item>.anticon>.icon{
+  width: 25px;
+}
+
+.ant-menu-horizontal > .ant-menu-submenu{
+  top:0px
+}
+
+.avatarDropdown{
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  cursor: pointer;
+  width: 7rem;
+  color: setColor(redish);
+  .avatar-header{
+    margin-right: 4px;
+  }
+}
+
+.avatarUser{
+  font-size: 88%
+}
+
+
+
+.header-one {
+  &.-style-two {
+    .menu {
+      background-color: setColor(blue);
+      &-search {
+        &__form {
+          &-input {
+            .ant-btn {
+              background-color: $button-backgroundColor;
+              &:hover {
+                background-color: lighten($button-backgroundColor, 20%);
+              }
+            }
+          }
+        }
+      }
+      &-functions {
+        .menu-function-item {
+          span {
+            background-color: $button-backgroundColor;
+          }
+        }
+      }
+    }
+    .top-nav {
+      background-color: setColor(blue);
+    }
+  }
+}
+
+.header-scroll-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  box-shadow: #6e6e6e 0px 1px 11px;
+  &.fixed {
+    position: fixed;
+    box-shadow: #6e6e6e 0px 1px 11px;
+    animation: example 0.5s cubic-bezier(0.445, 0.05, 0.55, 0.95) forwards;
+    .header-one {
+      .top-nav {
+        display: none;
+      }
+      .menu-mobile-search {
+        display: none;
+      }
+    }
+  }
+}
+
+@keyframes example {
+  from {
+    transform: translateY(-100px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+

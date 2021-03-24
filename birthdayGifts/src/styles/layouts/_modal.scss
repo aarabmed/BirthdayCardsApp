@@ -1,0 +1,48 @@
+
+.category-modal-container{
+display: flex;
+justify-content: space-between;
+flex-direction: row;
+width: 100%;
+}
+
+.categoryImage{
+width:38%;
+cursor: pointer;
+transition: box-shadow 0.3s, border-color 0.3s;
+border: 1px solid #f0f0f0;
+}
+
+.categoryImage>img{
+width: 100%;
+border-radius: 3px;
+}
+
+.categoryImage:hover{
+border-color: transparent;
+box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
+}
+
+.modal-content{
+width: 60%;
+display: flex;
+flex-wrap: wrap;
+flex-direction: row;
+}
+
+.mc-main{
+flex: 1 0 50%;
+}
+
+.mc-sub-main>*{
+color: #fb5231;
+margin-left: 25px;
+}
+
+.user-modal-content{
+    padding-top: 15px;
+}
+
+.user-form>*{
+    justify-content: center;
+}

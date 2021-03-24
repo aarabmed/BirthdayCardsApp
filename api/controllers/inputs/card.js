@@ -42,5 +42,20 @@ module.exports ={
                 isBoolean:true,
             }
         ]
-    }
+    },
+    slugProperties:{
+        inputName:'slug',
+        validation:[
+            {
+                isEmpty:false
+            },
+            {
+                isLength:{min:4}
+            }
+            ,
+            {
+                isAlphabets:true,
+            },
+        ]
+    },
 }

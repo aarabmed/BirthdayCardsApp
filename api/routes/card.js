@@ -12,7 +12,7 @@ router.get("/:cardId", getCard);
 
 router.post("/new",checkAuth,uploadImage('cardImage'), createCard);
 
-router.patch("/:cardId",checkAuth, updateCard);
+router.patch("/:id",checkAuth,uploadImage('cardImage'), updateCard);
 
 router.post("/:cardId",checkAuth, deleteCard);
 

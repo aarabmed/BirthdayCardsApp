@@ -1,19 +1,24 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const userRoutes = require('./routes/user');
-const categoryRoute = require('./routes/category');
+const categoryRoute = require('./routes/categoryRoutes/category');
+const subRoute = require('./routes/categoryRoutes/sub');
+const subChildrenRoute = require('./routes/categoryRoutes/subChildren');
 const tagRoute = require('./routes/tag');
 const cardRoute = require('./routes/card');
 const accountRoute = require('./routes/account');
-const Card = require('./models/card');
-const Category = require('./models/category');
+const sessionRoute = require('./routes/session')
+
 
 const app = express();
 // app.use(express.json());
+app.use('/images',express.static('images'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
+      
     res.header("Access-Control-Allow-Origin", "*");
     res.header(
       "Access-Control-Allow-Headers",
@@ -24,14 +29,19 @@ app.use((req, res, next) => {
       return res.status(200).json({});
     }
     next();
-});
 
+   // console.log("Req:",req)
+
+});
 
 app.use("/account",accountRoute);
 app.use("/users",userRoutes);
 app.use("/cards",cardRoute);
-app.use("/categories",categoryRoute);
 app.use("/tags",tagRoute);
+app.use("/session",sessionRoute);
+app.use("/categories",categoryRoute);
+app.use("/sub-categories",subRoute);
+app.use("/sub-items",subChildrenRoute);
 
 app.use((req, res, next) => {
     const error = new Error("Page not found");

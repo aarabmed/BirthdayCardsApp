@@ -7,8 +7,23 @@ module.exports ={
                 isEmpty:true
             },
             {
-                isLength:{min:5}
+                isLength:{min:4}
             }
         ]
     },
+    slugProperties:{
+        inputName:'slug',
+        validation:[
+            {
+                isEmpty:false
+            },
+            {
+                isLength:{min:5}
+            }
+            ,
+            {
+                isAlphabets:true,
+            },
+        ]
+    }
 }
