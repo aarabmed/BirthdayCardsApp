@@ -3,10 +3,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const CategorySchema = new Schema({
-    title: {
-        type:String,
-        required:true,
-    },
     name : {
         type:String,
         required:true,
@@ -26,6 +22,10 @@ const CategorySchema = new Schema({
     status:{
         type:Boolean,
         required:true
+    },
+    deleted:{
+        type:Boolean,
+        default:false,
     },
     createdBy:{
         type:Schema.Types.ObjectId,
@@ -49,10 +49,6 @@ const CategorySchema = new Schema({
 
 
 const SubCategorySchema = new Schema({
-    title : {
-        type:String,
-        required:true,
-    },
     name : {
         type:String,
         required:true,
@@ -68,6 +64,10 @@ const SubCategorySchema = new Schema({
     image:{
         type:Object,
         required:true
+    },
+    deleted:{
+        type:Boolean,
+        default:false
     },
 
     createdBy:{
@@ -99,13 +99,18 @@ const SubCategorySchema = new Schema({
 
 
 const SubCategoryChildSchema = new Schema({
-    title : {
-        type:String,
-        required:true,
-    },
+
     name : {
         type:String,
         required:true,
+    },
+    description:{
+        type:String,
+        required:true,
+    },
+    deleted:{
+        type:Boolean,
+        default:false
     },
     slug:{
         type:String,
@@ -114,7 +119,7 @@ const SubCategoryChildSchema = new Schema({
     image:{
         type:Object,
         required:true
-    },
+    }, 
     createdBy:{
         type:Schema.Types.ObjectId,
         ref:'User'

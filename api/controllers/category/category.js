@@ -3,8 +3,9 @@ const {Category} = require('../../models/category');
 const User = require('../../models/user');
 const validate = require('../../utils/inputErrors');
 const {authorities}= require('../../utils/authority')
+const isBoolean = require('../../utils/toBoolean');
 
-const {nameProperties,titleProperties,descriptionProperties,imageProperties,slugProperties} = require('../inputs/category')
+const {nameProperties,statusProperties,descriptionProperties,imageProperties,slugProperties} = require('../inputs/category')
 
 //! ----- RETRIEVE A SINGLE CATEGORY ----------
 /* exports.getCategory = async (req, res, next) => {
@@ -13,12 +14,13 @@ const {nameProperties,titleProperties,descriptionProperties,imageProperties,slug
 
 //! ----- RETRIEVE ALL CATEGORIES ----------
 exports.getAllCategories = async (req, res, next) => {
-    const categories = await Category.find()
+    const categories = await Category.find({deleted:false})
         .populate([
-            {path:"subCategory",select:"tags name -_id",
+            {path:"subCategory",select:"tags name _id",model:'SubCategory',match:{deleted:false},
                 populate:{
                     path:"children",
-                    select:"tags"
+                    select:"tags name -id",
+                    match:{deleted:false}
                 }
             }
         ]);
@@ -38,19 +40,16 @@ exports.getAllCategories = async (req, res, next) => {
 
 //! ----- CREATE A NEW CATEGORY ----------
 exports.createCategory = async (req, res, next) => {
+
     const currentUserId=req.body.currentUserId
-    const title = req.body.title
     const name = req.body.name
     const slug = req.body.slug
     const description = req.body.description
-    const subCategory = req.body.subCategory??[]
-    const categoryImage = req.file
-
-    
+    let subCategory = req.body.subCategory ? JSON.parse(req.body.subCategory):[]
+    const categoryImage = req.file??''
     
     const isError = [
         await validate(name,nameProperties),
-        await validate(title,titleProperties),
         await validate(slug,slugProperties),
         await validate(description,descriptionProperties),
         await validate(categoryImage,imageProperties),
@@ -75,10 +74,8 @@ exports.createCategory = async (req, res, next) => {
     }
     const newName= name.split(' ').map(capitalize).join(' ');
     const newSlug= slug.split(' ').join('-').toLowerCase();
-    const newTitle= title.split(' ').map(capitalize).join(' ');
 
     const category = await new Category({
-        title:newTitle,
         name:newName,
         description,
         image:newImage,
@@ -109,18 +106,18 @@ exports.createCategory = async (req, res, next) => {
 //! ----- EDIT A CATEGORY ----------
 exports.updateCategory = async (req, res, next) => {
     const currentUserId=req.body.currentUserId
-    const categoryId = req.body.categoryId;
-    const title = req.body.title
+    const categoryId = req.params.id;
     const name = req.body.name;
     const slug = req.body.slug
     const description = req.body.description;
-    const categoryImage = req.file;
-    const subCategory = req.body.subCategory??[]
+    const status = isBoolean(req.body.status);
+    const categoryImage = req.file??'';
+    let subCategory = req.body.subCategory ? JSON.parse(req.body.subCategory):[]
 
     const isError = [
         await validate(name,nameProperties),
-        await validate(title,titleProperties),
         await validate(slug,slugProperties),
+        await validate(status,statusProperties),
         await validate(description,descriptionProperties),
     ].filter(e=>e!==true);
 
@@ -150,20 +147,18 @@ exports.updateCategory = async (req, res, next) => {
     
     
 
-    // const removedSubCategory = category.subCategory.filter(t=>!subCategory.includes(t))
-    // const newSubCategory = subCategory.filter(t=>!category.subCategory.includes(ObjectID(t)))
+
 
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
     const newName= name.split(' ').map(capitalize).join(' ');
     const newSlug= slug.split(' ').join('-').toLowerCase();
-    const newTitle= title.split(' ').map(capitalize).join(' ');
 
     category.name = newName;
-    category.title = newTitle;
     category.description = description;
     category.slug = newSlug;
+    category.status = status;
     categoryImage && (category.image = newImage);
     category.subCategory = subCategory;
     category.updatedBy=currentUserId;
@@ -190,9 +185,8 @@ exports.updateCategory = async (req, res, next) => {
 
 //! ----- DELETE A CATEGORY ----------
 exports.deleteCategory = async (req, res, next) => {
-    const categoryId = req.body.categoryId;
-    const currentUserId = req.userId
-
+    const categoryId = req.params.id;
+    const currentUserId = req.body.currentUserId
 
     const currentUser = await User.findById(currentUserId)
 
@@ -206,10 +200,11 @@ exports.deleteCategory = async (req, res, next) => {
             })
         }
 
-        category.status = false;
+        category.deleted = true;
         category.deletedBy=currentUserId
+
+       
         const deletedCategory  = await category.save();
-        
         if(!deletedCategory){
             return res.status(500).json({
                 data:null,
@@ -217,7 +212,7 @@ exports.deleteCategory = async (req, res, next) => {
             })
         }
 
-        return res.status(201).json({
+        return res.status(200).json({
             data:deletedCategory,
             message:`Category ${category.name} has been deleted successfully`
         })

@@ -8,12 +8,12 @@ const  {getCard,getAllCards,createCard, updateCard,deleteCard}= require('../cont
 
 router.get("/", getAllCards);
 
-router.get("/:cardId", getCard);
+router.get("/:id", getCard);
 
 router.post("/new",checkAuth,uploadImage('cardImage'), createCard);
 
 router.patch("/:id",checkAuth,uploadImage('cardImage'), updateCard);
 
-router.post("/:cardId",checkAuth, deleteCard);
+router.patch("/delete/:id",checkAuth, deleteCard);
 
 module.exports = router;

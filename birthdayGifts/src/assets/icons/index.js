@@ -8,6 +8,8 @@ import englishIcon from './english';
 import usersIcon from './users'
 import homeIcon from './home'
 import tagIcon from './tag'
+import failIcon from './fail';
+import successIcon from './success'
 
 export default {
      cardsIcon, 
@@ -20,4 +22,6 @@ export default {
      giftsIcon,
      homeIcon,
      tagIcon,
+     failIcon,
+     successIcon
  }

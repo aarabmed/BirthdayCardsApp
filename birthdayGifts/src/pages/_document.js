@@ -20,11 +20,6 @@ class MyDocument extends Document {
           />
           <link href="/assets/css/elegant-icon.css" rel="stylesheet" />
           <link href="/assets/css/icomoon-icon.css" rel="stylesheet" />
-          <style global jsx>{`
-          div#__next{
-            height: 100%;
-          }
-        `}</style>
         </Head>
         <body>
           <Main/>

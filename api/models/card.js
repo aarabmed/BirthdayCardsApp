@@ -43,7 +43,7 @@ const cardSchema = new Schema({
     },
     deleted:{
         type:Boolean,
-        required:true
+        default:false
     },
     createdBy:{
         type:Schema.Types.ObjectId,

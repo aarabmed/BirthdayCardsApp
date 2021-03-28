@@ -17,7 +17,7 @@ const session = ironSession({
 });
 
 router.post('/login',session,accountController.userLogin);
-router.get('/new_password',auth,accountController.updateUserPassword);
+router.patch('/new_password/:id',auth,accountController.updateUserPassword);
 router.get('/logout',auth,accountController.userLogout);
 router.post('/signup', accountController.createUser);
 

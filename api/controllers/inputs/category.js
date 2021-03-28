@@ -30,6 +30,14 @@ module.exports={
             },
         ]
     },
+    statusProperties:{
+        inputName:'status',
+        validation:[
+            {
+                isBoolean:true
+            },
+        ]
+    },
     slugProperties:{
         inputName:'slug',
         validation:[

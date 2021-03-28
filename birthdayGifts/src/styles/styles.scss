@@ -5,11 +5,13 @@
 @import "abstracts/mixins";
 @import "abstracts/variables";
 
+
 @import "base/container";
 @import "base/font-family";
 @import "base/reset";
 @import "base/transition";
 
+@import "components/category";
 @import "components/banners";
 @import "components/login";
 @import "components/userModal";

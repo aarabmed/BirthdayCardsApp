@@ -53,6 +53,14 @@ module.exports={
             }
         ]
     },
+    statusProperties:{
+        inputName:'status',
+        validation:[
+            {
+                isBoolean:true
+            },
+        ]
+    },
     imageProperties:{
         inputName:'subCategoryChildImage',
         validation:[

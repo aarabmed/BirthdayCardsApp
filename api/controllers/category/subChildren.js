@@ -3,10 +3,13 @@ const {SubCategoryChild} = require('../../models/category');
 const Tag = require('../../models/tag');
 const User = require('../../models/user');
 const validate = require('../../utils/inputErrors');
+const isBoolean = require('../../utils/toBoolean');
+
 const ObjectID = require('mongodb').ObjectID;
+
 const {authorities} = require('../../utils/authority');
 
-const {descriptionProperties,titleProperties,imageProperties,slugProperties,nameProperties} = require('../inputs/subChildren')
+const {descriptionProperties,statusProperties,imageProperties,slugProperties,nameProperties} = require('../inputs/subChildren')
 
 
 
@@ -17,7 +20,7 @@ const {descriptionProperties,titleProperties,imageProperties,slugProperties,name
 
 //! ----- RETRIEVE ALL SUB-CATEGORIES ----------
 exports.getAllSubChildren = async (req, res, next) => {
-    const subChildren = await SubCategoryChild.find().populate({path:'tags',select:'name -_id',model:'Tag'});
+    const subChildren = await SubCategoryChild.find({deleted:false}).populate({path:'tags',select:'name _id',model:'Tag',match:{deleted:false}});
     if(!subChildren){
         return res.status(404).json({
             data:[],
@@ -35,17 +38,15 @@ exports.getAllSubChildren = async (req, res, next) => {
 //! ----- CREATE A NEW SUB-CATEGORY ----------
 exports.createSubCategoryChild = async (req, res, next) => {
     const currentUserId=req.body.currentUserId
-    const title = req.body.title
     const name = req.body.name
     const slug = req.body.slug
     const description = req.body.description
-    const tags = req.body.tags??[]
-    const subCategoryChildImage = req.file
+    const tags =req.body.tags? JSON.parse(req.body.tags):[]
+    const subCategoryChildImage = req.file??''
     
     
     const isError = [
         await validate(name,nameProperties),
-        await validate(title,titleProperties),
         await validate(slug,slugProperties),
         await validate(description,descriptionProperties),
         await validate(subCategoryChildImage,imageProperties),
@@ -70,12 +71,10 @@ exports.createSubCategoryChild = async (req, res, next) => {
     }
     const newName= name.split(' ').map(capitalize).join(' ');
     const newSlug= slug.split(' ').join('-').toLowerCase();
-    const newTitle= title.split(' ').map(capitalize).join(' ');
 
     
     const subCategoryChild = await new SubCategoryChild({
         description,
-        title:newTitle,
         image:newImage,
         status:true,
         slug:newSlug,
@@ -105,20 +104,22 @@ exports.createSubCategoryChild = async (req, res, next) => {
 
 //! ----- EDIT A SUB-CATEGORY ----------
 exports.updateSubCategoryChild = async (req, res, next) => {
+
     const subCategoryChildId = req.params.id;
-    const title = req.body.title
+    const currentUserId=req.body.currentUserId
     const slug = req.body.slug;
     const name = req.body.name
+    const status = isBoolean(req.body.status);
     const description = req.body.description;
-    const subCategoryChildImage = req.file;
-    const tags = req.body.tags??[];
-    const currentUserId=req.body.currentUserId
+    const subCategoryChildImage = req.file??'';
+    const tags = req.body.tags?JSON.parse(req.body.tags):[];
+    
 
 
     const isError = [
         await validate(name,nameProperties),
-        await validate(title,titleProperties),
         await validate(slug,slugProperties),
+        await validate(status,statusProperties),
         await validate(description,descriptionProperties),
     ].filter(e=>e!==true);
 
@@ -158,16 +159,15 @@ exports.updateSubCategoryChild = async (req, res, next) => {
     }
     const newName= name.split(' ').map(capitalize).join(' ');
     const newSlug= slug.split(' ').join('-').toLowerCase();
-    const newTitle= title.split(' ').map(capitalize).join(' ');
 
 
    
     subCategoryChild.description = description;
-    subCategoryChild.title = newTitle;
     subCategoryChild.updatedBy=currentUserId
     subCategoryChild.slug = newSlug;
     subCategoryChild.name = newName;
-    
+    subCategoryChild.status = status;
+
     subCategoryChildImage && (subCategoryChild.image = newImage);
     subCategoryChild.tags = tags
     
@@ -191,8 +191,8 @@ exports.updateSubCategoryChild = async (req, res, next) => {
 
 //! ----- DELETE A CATEGORY ----------
 exports.deleteSubCategoryChild = async (req, res, next) => {
-    const subCategoryChildId = req.body.subCategoryChildId;
-    const currentUserId = req.userId
+    const subCategoryChildId = req.params.id;
+    const currentUserId = req.body.currentUserId
 
 
     const currentUser = await User.findById(currentUserId)
@@ -207,7 +207,7 @@ exports.deleteSubCategoryChild = async (req, res, next) => {
             })
         }
 
-        subCategoryChild.status = false;
+        subCategoryChild.deleted = true;;
         subCategoryChild.deletedBy = currentUserId
         const deletedSubCategoryChild  = await subCategoryChild.save();
         

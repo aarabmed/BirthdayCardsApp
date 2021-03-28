@@ -26,6 +26,10 @@ const userSchema = new Schema({
         type:Boolean,
         require:true
     },
+    deleted:{
+        type:Boolean,
+        default:false
+    },
     validToken:{
         type:Boolean,
     }

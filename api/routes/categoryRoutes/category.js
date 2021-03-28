@@ -9,11 +9,11 @@ router.get("/", getAllCategories);
 
 // router.get("/categories/:categoryId", getCategory);
 
-router.post("/new",uploadImage('categoryImage'), createCategory);
+router.post("/new",uploadImage('categoryImage'),checkAuth, createCategory);
 
-router.post("/:categoryId", updateCategory);
+router.patch("/:id",uploadImage('categoryImage'),checkAuth, updateCategory);
 
-router.post("/:categoryId",checkAuth, deleteCategory);
+router.patch("/delete/:id",checkAuth, deleteCategory);
 
 
 module.exports = router;

@@ -4,20 +4,23 @@ import Spinner from "../../spin/spiner"
 import useSWR from "swr"
 import axios from 'axios'
 import moment from 'moment'
-
+import DynamicCategory from '@/components/modals/CategoryType'
 import {childrenColumns } from '../tables/categoryColumns'
 
 
 const SubCategoryChild=()=>{
     const fetcher = url => axios.get(url).then(res => res.data)
+    const { data, error ,mutate } = useSWR('/api/sub-items', fetcher)
 
-    const tableHeader = (name) =>(
+    const tableHeader = () =>(
         <div className='tableHeader'>
-            <Button type="primary" >Add a {name}</Button>
+            <DynamicCategory type='sub-category-child' mode='add'  runMutate={runMutate}/>
         </div>
     )
+
+    const runMutate =()=> mutate()
+
     const items = () =>{
-        const { data, error } = useSWR('/api/sub-items', fetcher)
         let newData = [];
         
         if(error){
@@ -35,12 +38,12 @@ const SubCategoryChild=()=>{
             image:elm.image.path,
             createdAt:moment(elm.createdAt).format('DD MMM YYYY'),
             updatedAt:moment(elm.updatedAt).format('DD MMM YYYY'),
-            status:[elm.status],
+            status:elm.status,
         }))
 
     
         return(
-           <>{console.log('subCategoryChild',newData)} <Table className='userTable' columns={childrenColumns} dataSource={newData} scroll={{x:1170}} title={()=>tableHeader('sub-category child')}/></>
+           <><Table className='userTable' columns={childrenColumns} dataSource={newData} scroll={{x:1170}} title={()=>tableHeader()}/></>
         )
     }
 

@@ -11,8 +11,8 @@ router.get("/", getAllSubCategories);
 
 router.post("/new",uploadImage('subCategoryImage'), createSubCategory);
 
-router.patch("/:id",checkAuth, updateSubCategory);
+router.patch("/:id",uploadImage('subCategoryImage'),checkAuth, updateSubCategory);
 
-router.post("/:id",checkAuth, deleteSubCategory);
+router.patch("/delete/:id",checkAuth, deleteSubCategory);
 
 module.exports = router;

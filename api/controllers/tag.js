@@ -2,7 +2,9 @@
 const Tag = require('../models/tag');
 const User = require('../models/user');
 const validate = require('../utils/inputErrors');
-const {nameProperties,slugProperties} = require('./inputs/tag')
+const isBoolean = require('../utils/toBoolean');
+
+const {nameProperties,slugProperties,statusProperties} = require('./inputs/tag')
 
 const {authorities}= require('../utils/authority')
 
@@ -14,7 +16,8 @@ const {authorities}= require('../utils/authority')
 
 //! ----- RETRIEVE ALL TAGS ----------
 exports.getAllTags = async (req, res, next) => {
-    const tags = await Tag.find();
+    const tags = await Tag.find({deleted:false});
+
     if(!tags){
         return res.status(404).json({
             data:[],
@@ -78,14 +81,16 @@ exports.createTag = async (req, res, next) => {
 
 //! ----- EDIT A TAG ----------
 exports.updateTag = async (req, res, next) => {
-    const tagId = req.body.tagId
+    const tagId = req.params.id
+    const currentUserId= req.body.currentUserId
     const name = req.body.name
     const slug = req.body.slug
-    const currentUserId= req.body.currentUserId
+    const status = isBoolean(req.body.status);
 
     const isError = [
         await validate(name,nameProperties),
         await validate(slug,slugProperties),
+        await validate(status,statusProperties)
     ].filter(e=>e!==true);
 
 
@@ -106,7 +111,8 @@ exports.updateTag = async (req, res, next) => {
     const tag = await Tag.findOne({_id:tagId})
 
     tag.name = newName;
-    tag.slug = newSlug
+    tag.slug = newSlug;
+    tag.status = status;
     tag.updatedBy = currentUserId
     const updatedTag  = await tag.save();
 
@@ -123,7 +129,7 @@ exports.updateTag = async (req, res, next) => {
 }
 
 
-
+/* 
 //! ----- TAGs STATUS----------
 exports.tagStatus = async (req, res, next) => {
     const currentUserId = req.body.currentUserId
@@ -169,17 +175,17 @@ exports.tagStatus = async (req, res, next) => {
         date:null,
         message:'Not authorised to update the status tag'
     })
-}
+} */
 
 
 //! ----- DELETE A TAG ----------
 exports.deleteTag = async (req, res, next) => {
-    const tagId = req.tagId;
-    const currentUserId = req.userId
+    const tagId = req.params.id;
+    const currentUserId = req.body.currentUserId
 
     const currentUser = await User.findById(currentUserId)
     if(authorities.includes(currentUser.authority)){
-        const tag = await Tag.findOneAndUpdate({_id:tagId},{deletedBy:currentUser._id})
+        const tag = await Tag.findOneAndUpdate({_id:tagId},{deletedBy:currentUser._id,deleted:true})
         if(!tag){
             return res.status(404).json({
                 date:null,

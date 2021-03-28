@@ -6,28 +6,52 @@ flex-direction: row;
 width: 100%;
 }
 
+
+.categoryFormInputs {
+    width: 65%;
+    .ant-row{
+        justify-content: end;
+    }
+}
+
 .categoryImage{
-width:38%;
-cursor: pointer;
-transition: box-shadow 0.3s, border-color 0.3s;
-border: 1px solid #f0f0f0;
+    width:35%;
+    cursor: pointer;
+    transition: box-shadow 0.3s, border-color 0.3s;
+    border: 1px solid #f0f0f0;
+}
+
+.categoryImage > .ant-row > .ant-col {
+    max-width: 100%;
+}
+
+.categoryImage > .ant-row > .ant-col>.ant-form-item-control-input {
+    height: 100%;
+}
+
+.categoryImage > .ant-row > .ant-col>.ant-form-item-control-input>.ant-form-item-control-input-content{
+    height: 100%;
+}
+
+.categoryImage > .ant-row {
+    height: 100%;
 }
 
 .categoryImage>img{
-width: 100%;
-border-radius: 3px;
+    width: 100%;
+    border-radius: 3px;
 }
 
 .categoryImage:hover{
-border-color: transparent;
-box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
+    border-color: transparent;
+    box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 3px 6px 0 rgba(0, 0, 0, 0.12), 0 5px 12px 4px rgba(0, 0, 0, 0.09);
 }
 
 .modal-content{
-width: 60%;
-display: flex;
-flex-wrap: wrap;
-flex-direction: row;
+    width: 95%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
 }
 
 .mc-main{
@@ -46,3 +70,28 @@ margin-left: 25px;
 .user-form>*{
     justify-content: center;
 }
+
+
+.warning-modal-container{
+    h4{
+        font-weight:bold ;
+        margin-bottom: 5px;
+    }
+    p{
+        span{
+            background-color: #c2c2c2;
+        }
+    }
+}
+
+.warrningModal{
+    display: flex;
+    justify-content: center;
+    >span:last-child{
+        display: flex;
+        align-items: center;
+        padding: 3px;
+        margin-left: 5px;
+    }
+}
+

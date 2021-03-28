@@ -32,7 +32,7 @@ const  AvatarInput =({getAvatarValue})=>{
       }
     }
 
-    const xx = <p>med</p>
+
 
     const items = [
                 <img key='1'
@@ -40,76 +40,81 @@ const  AvatarInput =({getAvatarValue})=>{
                 />,
               
                 <img
+                    key='2'
                       src={process.env.PUBLIC_URL + "/assets/avatars/2.png"}
                 />,
               
                 <img
+                    key='3'
                     src={process.env.PUBLIC_URL + "/assets/avatars/3.png"}
                   />,
               
                 <img
+                    key='4'
                     src={process.env.PUBLIC_URL + "/assets/avatars/4.png"}
                   />,
               
                 <img
+                    key='5'
                     src={process.env.PUBLIC_URL + "/assets/avatars/5.png"}
                   />,
               
                 <img
+                    key='6'
                     src={process.env.PUBLIC_URL + "/assets/avatars/6.png"}
                   />,
               
                 <img
+                    key='7'
                     src={process.env.PUBLIC_URL + "/assets/avatars/7.png"}
                   />,
               
 
                 <img
-                      src={process.env.PUBLIC_URL + "/assets/avatars/8.png"}
+                    key='8'  src={process.env.PUBLIC_URL + "/assets/avatars/8.png"}
                   />,
               
                 <img
-                      src={process.env.PUBLIC_URL + "/assets/avatars/9.png"}
+                    key='9'  src={process.env.PUBLIC_URL + "/assets/avatars/9.png"}
                 />,
               
 
                 <img
-  
+                    key='10'
                     src={process.env.PUBLIC_URL + "/assets/avatars/10.png"}
                 />,
               
 
                 <img
-  
+                    key='11'
                     src={process.env.PUBLIC_URL + "/assets/avatars/11.png"}
                 />,
               
 
                 <img
-  
+                    key='12'
                     src={process.env.PUBLIC_URL + "/assets/avatars/12.png"}
                 />,
               
 
                 <img
-  
+                    key='13'
                     src={process.env.PUBLIC_URL + "/assets/avatars/13.png"}
                 />,
               
 
                 <img
-  
+                    key='14'
                     src={process.env.PUBLIC_URL + "/assets/avatars/14.png"}
                 />,
               
 
                 <img
-  
+                    key='15'
                     src={process.env.PUBLIC_URL + "/assets/avatars/15.png"}
                 /> 
     ]
-    const checkedIcon = <CheckCircleTwoTone key="1"/>
-    const newItems = items.map((item,index)=><div className="singleAvatar" key={index} data-index={index+1}>{ avatarValue===index+1?(<div className="active"><CheckCircleTwoTone key="1"/>{item}</div>):item}</div>)
+    const newItems = items.map((item,index)=><div className="singleAvatar" key={index} data-index={index+1}>{ avatarValue===index+1?(<div className="active"><CheckCircleTwoTone key="1465412"/>{item}</div>):item}</div>)
       return (
         <div className='avatar-container'>
            <Popover

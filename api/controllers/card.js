@@ -12,7 +12,7 @@ const {titleProps,descProps,cardImageProps,cardSizeProps,statusProps,slugPropert
 
 //! ----- RETRIEVE A SINGLE CARD ----------
 exports.getCard = async (req, res, next) => {
-    const cardId = req.params.cardId
+    const cardId = req.params.id
     const card = Card.findOne({_id:cardId});
     if(!card){
         return res.status(404).json({
@@ -32,7 +32,7 @@ exports.getAllCards = async (req, res, next) => {
     const size = req.body.size;
     const { limit,offset } = getPagination(page,size)
 
-    const results = await Card.paginate({},{offset,limit,sort:{createdAt:-1},populate:['tags','category']})
+    const results = await Card.paginate({deleted:false},{offset,limit,sort:{createdAt:-1},populate:['tags','category']})
     
     return res.status(200).json({
         data:results.docs,
@@ -261,8 +261,8 @@ exports.updateCard = async (req, res, next) => {
 
 //! ----- DELETE A CARD ----------
 exports.deleteCard = async (req, res, next) => {
-    const currentUserId = req.currentUserId;
-    const cardId = req.cardId;
+    const currentUserId = req.body.currentUserId;
+    const cardId = req.params.id;
 
     const currentUser = await User.findById(currentUserId)
     if(authorities.includes(currentUser.authority)){

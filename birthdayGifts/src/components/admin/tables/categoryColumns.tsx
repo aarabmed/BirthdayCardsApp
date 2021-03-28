@@ -1,4 +1,7 @@
 import ModalView from '@/components/modals/ViewCategory'
+import EditCategory from '@/components/modals/CategoryType'
+import DeleteComponent from '@/components/modals/deleteItem'
+import {CATEGORY,SUB_CATEGORIES_CHILD,SUB_CATEGORIES} from 'common/apiEndpoints'
 import {Tag, Space} from "antd";
 
   export const categoryColumns = [
@@ -19,19 +22,17 @@ import {Tag, Space} from "antd";
       key: 'status',
       dataIndex: 'status',
       //responsive: ['md'],
-      render: status => (
+      render: status => {
+        let color = status? 'green':'volcano'
+        let tag = status?'Active' : 'Inactive'
+        return (
         <>
-          {status.map(elm => {
-            let color = elm? 'green':'volcano'
-            let tag = elm?'Active' : 'Inactive'
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
+          <Tag color={color} key={tag}>
+            {tag.toUpperCase()}
+          </Tag>
         </>
-      ),
+        )
+      },
     },
     {
         title: 'Date created',
@@ -43,15 +44,25 @@ import {Tag, Space} from "antd";
       title: 'Action',
       key: 'action',
       //fixed: 'right',
-      render: (text, record) => (
-        <Space size="middle">
-          <ModalView name='More' record={record}  type='category' />
-          <a>Edit</a>
-          <a>Delete</a>
-        </Space>
-      ),
+      render: (text, record) => {
+        const item = {
+          type:'Category',
+          targetUrl: CATEGORY,
+          itemId:record.key,
+          itemName:record.name
+        }
+        return(
+          <Space size="middle">
+            <ModalView name='More' record={record}  type='category' />
+            <EditCategory type='category' item={record} mode='edit'/>
+            <DeleteComponent {...item} />
+          </Space>
+        )
+      }
     },
   ];
+
+
 
   export const subCategoryColumns = [
     {
@@ -69,19 +80,17 @@ import {Tag, Space} from "antd";
       title: 'Status',
       key: 'status',
       dataIndex: 'status',
-      render: status => (
+      render: status => {
+        let color = status? 'green':'volcano'
+        let tag = status?'Active' : 'Inactive'
+        return (
         <>
-          {status.map(elm => {
-            let color = elm? 'green':'volcano'
-            let tag = elm?'Active' : 'Inactive'
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
+          <Tag color={color} key={tag}>
+            {tag.toUpperCase()}
+          </Tag>
         </>
-      ),
+        )
+      },
     },
     {
       title: 'date Created',
@@ -91,15 +100,26 @@ import {Tag, Space} from "antd";
     {
       title: 'Action',
       key: 'action',
-      render: (text, record) => (
+      render: (text, record) =>{
+        const item = {
+          type:'Sub-category',
+          targetUrl: SUB_CATEGORIES,
+          itemId:record.key,
+          itemName:record.name
+        }
+        return(
         <Space size="middle">
           <ModalView name='More' record={record} type='subCategory' />
-          <a>Edit</a>
-          <a>Delete</a>
+          <EditCategory type='sub-category' item={record} mode='edit'/>
+          <DeleteComponent {...item}/>
         </Space>
-      ),
+        )
+      }
     },
   ];
+
+
+
 
   export const childrenColumns = [
     {
@@ -118,19 +138,17 @@ import {Tag, Space} from "antd";
       title: 'Status',
       key: 'status',
       dataIndex: 'status',
-      render: status => (
+      render: status => {
+        let color = status? 'green':'volcano'
+        let tag = status?'Active' : 'Inactive'
+        return (
         <>
-          {status.map(elm => {
-            let color = elm? 'green':'volcano'
-            let tag = elm?'Active' : 'Inactive'
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
+          <Tag color={color} key={tag}>
+            {tag.toUpperCase()}
+          </Tag>
         </>
-      ),
+        )
+      },
     },
     {
       title: 'date Created',
@@ -140,13 +158,20 @@ import {Tag, Space} from "antd";
     {
       title: 'Action',
       key: 'action',
-      render: (text, record) => (
-        
+      render: (text, record) => {
+        const item = {
+          type:'Sub-category child',
+          targetUrl: SUB_CATEGORIES_CHILD,
+          itemId:record.key,
+          itemName:record.name
+        }
+        return (
         <Space size="middle">
           <ModalView name='More' record={record} type='subCategoryItems' />
-          <a>Edit</a>
-          <a>Delete</a>
+          <EditCategory type='sub-category-child' item={record} mode='edit'/>
+          <DeleteComponent {...item}/>
         </Space>
-      ),
+        )
+      }
     },
   ];

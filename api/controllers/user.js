@@ -8,9 +8,8 @@ const {authorities, valideAuthority}= require('../utils/authority')
 
 //! ----- RETRIEVE A SINGLE USER ----------
 exports.getUser = async (req, res, next) => {
-    const userId = req.params.userId;  
-    console.log('sss:',req.session.get('user'))
-    const user = await User.findOne({_id:userId})
+    const userId = req.params.currentUserId;  
+    const user = await User.findOne({_id:userId,deleted:false})
     if(!user){
         return res.status(404).json({
             date:null,
@@ -38,7 +37,8 @@ exports.getUser = async (req, res, next) => {
 
 //! ----- RETRIEVE ALL USERS ----------
 exports.getAllUsers = async (req, res, next) => {
-    const users = await User.find();
+    
+    const users = await User.find({deleted:false});
     if(!users.length){
         return res.status(404).json({
             date:null,

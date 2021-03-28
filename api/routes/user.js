@@ -16,12 +16,12 @@ const router = express.Router();
  const  {getUser,getAllUsers, updateUser,deleteUser}= require('../controllers/user')
 
 
-router.get("/", getAllUsers);
+router.get("/",checkAuth, getAllUsers);
 
-router.get("/:userId", getUser);
+router.get("/:id",checkAuth, getUser);
 
-router.patch("/:userId",checkAuth, updateUser);
+router.patch("/:id",checkAuth, updateUser);
 
-router.post("/:userId",checkAuth, deleteUser);
+router.patch("/delete/:id",checkAuth, deleteUser);
 
 module.exports = router;

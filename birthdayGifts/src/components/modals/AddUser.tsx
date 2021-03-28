@@ -44,7 +44,7 @@ import {withAuth} from '../../context/helper'
 
     const onCreate = (values) => { 
         setConfirmLoading(true);
-        const data = {...values,userId}
+        const data = {...values,currentUserId:userId}
   
         axios({
             url:'/api/account/signup',
@@ -80,24 +80,21 @@ import {withAuth} from '../../context/helper'
     }
 
     const options =()=>{
-        switch (authority) {
-            case 'ADMIN':
-                ( 
-                <Select>
-                    <Select.Option value="ADMIN">ADMIN</Select.Option>
-                    <Select.Option value="USER">USER</Select.Option>
-                </Select>
-                )
-                break;
-            case 'SUPER-ADMIN':
-                <Select>
-                    <Select.Option value="SUPER_ADMIN">SUPER ADMIN</Select.Option>
-                    <Select.Option value="ADMIN">ADMIN</Select.Option>
-                    <Select.Option value="USER">USER</Select.Option>
-                </Select>
-                break;
-            default:
-                break;
+        console.log('AUTHORITY:',authority)
+        const superAdminOptions  = [
+            {label:'USER',value:"USER"},
+            {label:'ADMIN',value:"ADMIN"},
+            {label:'SUPER ADMIN',value:"SUPER_ADMIN"}
+        ]
+        const adminOptions = [
+            {label:'USER',value:"USER"},
+            {label:'ADMIN',value:"ADMIN"},
+        ]
+
+        if(authority==='ADMIN'){
+            return adminOptions
+        }else if(authority==='SUPPER_ADMIN'){
+            return superAdminOptions
         }
     }
       
@@ -164,7 +161,7 @@ import {withAuth} from '../../context/helper'
                     rules={[
                         { required: true, message: 'Please select an account role!' },
                     ]}>
-                    {options}
+                    <Select  options={options()} />
                 </Form.Item>
                 <Form.Item
                     name="avatar"

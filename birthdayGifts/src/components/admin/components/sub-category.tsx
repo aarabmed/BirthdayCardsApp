@@ -4,20 +4,23 @@ import Spinner from "../../spin/spiner"
 import useSWR from "swr"
 import axios from 'axios'
 import moment from 'moment'
-
+import DynamicCategory from 'components/modals/CategoryType'
 import {subCategoryColumns } from '../tables/categoryColumns'
 
 
 const SubCategory=()=>{
     const fetcher = url => axios.get(url).then(res => res.data)
+    const { data, error, mutate } = useSWR('/api/sub-categories', fetcher)
 
-    const tableHeader = (name) =>(
+    const tableHeader = () =>(
         <div className='tableHeader'>
-            <Button type="primary" >Add a {name}</Button>
+            <DynamicCategory type='sub-category' mode='add'  runMutate={runMutate}/>
         </div>
     )
+
+    const runMutate =()=> mutate()
+
     const subCategories = () =>{
-        const { data, error } = useSWR('/api/sub-categories', fetcher)
         let newData = [];
         
         if(error){
@@ -35,7 +38,7 @@ const SubCategory=()=>{
         createdAt:moment(elm.createdAt).format('DD MMM YYYY'),
         updatedAt:moment(elm.updatedAt).format('DD MMM YYYY'),
         childrenSubCategory:elm.childrenSubCategory,
-        status:[elm.status],
+        status:elm.status,
         }))
 
     

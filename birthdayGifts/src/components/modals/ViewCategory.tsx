@@ -1,25 +1,31 @@
 import React, { useState } from 'react';
 import {Tag, Modal, Divider} from "antd";
-
+import redirectToLogin from 'common/redirectToLogin'
+import checkAuth from 'common/auth'
 
   type category ={
     name:React.ReactChild,
-    title:React.ReactChild,
     slug:React.ReactChild,
     status:React.ReactChild,
     createdAt:React.ReactChild,
     lastUpdate:React.ReactChild,
-    tags:[React.ReactChild],
+    tags?:[React.ReactChild],
     subCategory?:[React.ReactChild],
     childrenSubCategory?:[React.ReactChild]
   }
- const ModalView = (props) => {
+const ModalView = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState({});
 
-  const showModal = () => {
-    setIsModalVisible(true);
-    convert(props);
+  const showModal = async () => {
+    const isAuth = await checkAuth()
+    if(isAuth){
+      setIsModalVisible(true);
+      convert(props);
+      return
+    }
+    redirectToLogin()
+    
   };
 
   const handleOk = () => {
@@ -38,23 +44,23 @@ import {Tag, Modal, Divider} from "antd";
     const value = record;
     let newObject:category = {
       name:<span>{value.name}</span>,
-      title:value.title&&<span>{value.title}</span>,
       slug:<span>{value.slug}</span>,
-      status:value.status.map((item,index)=>(<Tag key={index} color={item? 'green':'volcano'}>{item?'Active' : 'Inactive'}</Tag>)),
+      status:<Tag color={value.status? 'green':'red'}>{value.status?'Active' : 'Inactive'}</Tag>,
       createdAt:<span>{value.createdAt}</span>,
       lastUpdate:<span>{value.updatedAt}</span>,
-      tags:value.tags.length?[value.tags.map((item,index)=>(<Tag color="magenta" key={index}>{item}</Tag>))]:[<span key='111'>no tag associated</span>],
     }
 
     if(type==='category'){
       newObject = {
         ...newObject,
+        tags:value.tags.length?[value.tags.map((item,index)=>(<Tag color="magenta" key={index}>{item}</Tag>))]:[<span key='111'>no tag associated</span>],
         subCategory:value.subCategory.length?[value.subCategory.map((item,index)=>(<Tag color="blue" key={index}>{item}</Tag>))]:[<span key='111'>no sub-category associated</span>]
       }
     }
     if(type==='subCategory'){
       newObject = {
-        ...newObject,     
+        ...newObject,  
+        tags:value.tags.length?[value.tags.map((item,index)=>(<Tag color="magenta" key={index}>{item}</Tag>))]:[<span key='111'>no tag associated</span>],   
         childrenSubCategory:value.childrenSubCategory.length?[value.childrenSubCategory.map((item,index)=>(<Tag color="success" key={index}>{item}</Tag>))]:[<span key='111'>no sub-items associated</span>],
       }
     }
@@ -93,7 +99,7 @@ import {Tag, Modal, Divider} from "antd";
   return (
     <>
       <a onClick={showModal}>{name}</a>
-      <Modal visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} width={820}>
+      <Modal visible={isModalVisible} onCancel={handleCancel} footer={null} width={820}>
         <div className='category-modal-container'>
           <div
             className='categoryImage'

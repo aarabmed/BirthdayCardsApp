@@ -17,7 +17,7 @@ const tagSchema = new Schema({
     },
     deleted:{
         type:Boolean,
-        required:true
+        default:false
     },
     statusUpdatedBy:{
         type:Schema.Types.ObjectId,

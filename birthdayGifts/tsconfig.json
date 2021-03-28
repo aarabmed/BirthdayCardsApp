@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
-      "assets/*": ["./assets/icons*"],
+      "assets/*": ["./assets/*"],
       "@/*": ["./*"]
     },
     "baseUrl": "src",

@@ -1,8 +1,6 @@
 const validator = require('validator');
 
-module.exports = async (value,properties)=>{
-    const input = !value?'':value;
-   // console.log("input:",value);
+module.exports = async (input,properties)=>{
     let results;
     const { inputName, validation} = properties
     validation.forEach(prop => {
@@ -57,7 +55,7 @@ module.exports = async (value,properties)=>{
             }
         }
         if(isBoolean===true){
-            if(typeof input !=='boolean'){
+            if(typeof input !== 'boolean'){
                 return results = ({
                     [inputName]: `${inputName} input takes only boolean value!`,
                 })

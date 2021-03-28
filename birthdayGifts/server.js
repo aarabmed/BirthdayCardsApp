@@ -12,7 +12,7 @@ const handler = app.getRequestHandler();
 
 const devProxy = {
     '/api': {
-      target: 'http://localhost:7000/',
+      target: 'http://localhost:7000',
       pathRewrite: { '^/api': '/' },
       changeOrigin: true,
     },

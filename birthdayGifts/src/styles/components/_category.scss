@@ -1,0 +1,28 @@
+.addCategory-form{
+    width:100%;
+    display: flex;
+}
+
+.image-uploader{
+    width: 100%;
+    height: 100%;
+    .ant-upload{
+        width: 100%;
+        height: 100%;
+    }
+}
+.imagePreview{
+    position: relative;
+    &>span{
+        font-weight: bolder;
+        color: #fff;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: #363636bf;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+    }
+}

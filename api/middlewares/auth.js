@@ -6,9 +6,9 @@ module.exports=async (req,res,next)=>{
     const authHeader = req.get('Authorization')
 
     if(!authHeader){
-        const error = {message:'Not Authenticated'};
+        const error = {message:'You are not Authenticated'};
         error.code=401;
-        return res.json({error})
+        return res.status(401).json({error})
     }
     const token = authHeader.split(' ')[1];
     let decodedToken ;
@@ -17,23 +17,23 @@ module.exports=async (req,res,next)=>{
             decodedToken = jwt.verify(token,key)
         } 
         catch (err) {
-            const error = {message:'Not Authenticated'};
+            const error = {message:'You are not Authenticated'};
             error.code=401;
-            return res.json({error})
+            return res.status(401).json({error})
         }
         
 
         if(!decodedToken){
-            const error = {message:'Not Authenticated'};
+            const error = {message:'You are not Authenticated'};
             error.code=401;
-            return res.json({error})
+            return res.status(401).json({error})
         }                                                               
     const user = await User.findById(decodedToken.userId);
 
     if(!user.validToken&&decodedToken){
-        const error = {message:'Not Authenticated'};
+        const error = {message:'You are not Authenticated'};
         error.code=401;
-        return res.json({error})
+        return res.status(401).json({error})
     }
     req.isAuth = true
     req.userId = decodedToken.userId

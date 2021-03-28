@@ -8,22 +8,31 @@ import axios from 'axios'
 import AddUserModal from '../modals/AddUser'
 import {userColumns } from './tables/userColumns'
 import Spinner from '../spin/spiner'
+import { parseCookies } from "nookies";
 
 
+const axiosHeader = ()=>{
+  const {token} = parseCookies()
+  const config = {
+      headers: { Authorization: `Bearer ${token}` }
+  };
+  return config
+}
 
 const userPage =()=>{
   const [isLoading, setIsLoading] = useState(true);
   const {currentUser} = useSelector((state) => state.userReducer);
   const {authority} = currentUser
 
-  const fetcher = url => axios.get(url).then(res => res.data)
+  const fetcher = url => axios.get(url,axiosHeader()).then(res => res.data)
 
-  const { data, error } = useSWR('/api/users', fetcher)
-  mutate('/api/users')
+  const { data, error, mutate } = useSWR('/api/users', fetcher)
+  
   
 
   const onFetch = () => {
     setIsLoading(true)
+    mutate()
   }
 
   useEffect(() => {

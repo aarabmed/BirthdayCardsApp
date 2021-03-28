@@ -13,6 +13,6 @@ router.post("/new",uploadImage('subCategoryChildImage'), createSubCategoryChild)
 
 router.patch("/:id",uploadImage('subCategoryChildImage'), updateSubCategoryChild);
 
-router.post("/:id",checkAuth, deleteSubCategoryChild);
+router.post("/delete/:id",checkAuth, deleteSubCategoryChild);
 
 module.exports = router;

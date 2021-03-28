@@ -10,8 +10,8 @@ router.get("/", getAllTags);
 
 router.post("/new",checkAuth, createTag);
 
-router.patch("/:tagId",checkAuth,checkAuth, updateTag);
+router.patch("/:id",checkAuth, updateTag);
 
-router.post("/:tagId",checkAuth, deleteTag);
+router.patch("/delete/:id",checkAuth, deleteTag);
 
 module.exports = router;

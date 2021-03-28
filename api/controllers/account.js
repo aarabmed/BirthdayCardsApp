@@ -96,7 +96,7 @@ exports.updateUserPassword = async (req, res, next) => {
     
     const oldPassword = req.body.oldPassword;
     const password = req.body.password;
-    const userId = req.userId;
+    const userId = req.params.id;
 
     const {passwordProperties,oldPasswordProperties} = signupInputs;
 
@@ -144,7 +144,7 @@ exports.updateUserPassword = async (req, res, next) => {
 
 //! ----- CREATE A NEW USER ----------
 exports.createUser = async (req, res, next) => {
-    const userId = req.body.userId??'';
+    const userId = req.body.currentUserId??'';
     const userName = req.body.userName;
     const password = req.body.password;
     const newAuthority = req.body.role;
@@ -219,7 +219,7 @@ exports.createUser = async (req, res, next) => {
         createdAt: createdUser.createdAt.toISOString(),
         status:createdUser.status,
         email:createdUser.email,
-        userId : createdUser.id,
+        userId : createdUser._id,
         avatar:createdUser.avatar
     }
     return res.status(201).json({
