@@ -4,7 +4,7 @@ import Spinner from "../../spin/spiner"
 import useSWR from "swr"
 import axios from 'axios'
 import moment from 'moment'
-import DynamicCategory from 'components/modals/CategoryType'
+import DynamicCategory from 'components/modals/Category'
 import {subCategoryColumns } from '../tables/categoryColumns'
 
 
@@ -44,7 +44,7 @@ const SubCategory=()=>{
     
         return(
          
-            <>{console.log('subCategoryColumns:',newData)}<Table className='userTable' scroll={{x:1170}} columns={subCategoryColumns} dataSource={newData} title={()=>tableHeader('sub-category')}/></>
+            <><Table className='userTable' scroll={{x:1170}} columns={subCategoryColumns} dataSource={newData} title={()=>tableHeader()}/></>
         )
     }
 

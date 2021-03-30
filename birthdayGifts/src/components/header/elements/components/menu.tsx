@@ -4,7 +4,7 @@ import React from 'react';
 import Router from "next/router"
 import { useSelector, useDispatch } from "react-redux";
 import classNames from "classnames";
-import { setRoute } from "@/redux/actions/globalActions";
+import { setRoute } from "redux/actions/globalActions";
 import CustomIcon from './customIcon'
 
 

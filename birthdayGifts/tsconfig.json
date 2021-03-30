@@ -2,7 +2,6 @@
   "compilerOptions": {
     "paths": {
       "assets/*": ["./assets/*"],
-      "@/*": ["./*"]
     },
     "baseUrl": "src",
     "target": "esnext",

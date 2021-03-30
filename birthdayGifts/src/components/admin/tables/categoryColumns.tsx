@@ -1,7 +1,7 @@
-import ModalView from '@/components/modals/ViewCategory'
-import EditCategory from '@/components/modals/CategoryType'
-import DeleteComponent from '@/components/modals/deleteItem'
-import {CATEGORY,SUB_CATEGORIES_CHILD,SUB_CATEGORIES} from 'common/apiEndpoints'
+import ModalView from 'components/modals/ViewCategory'
+import EditCategory from 'components/modals/Category'
+import DeleteComponent from 'components/modals/removeItem'
+import {CATEGORIES,SUB_CATEGORIES_CHILD,SUB_CATEGORIES} from 'common/apiEndpoints'
 import {Tag, Space} from "antd";
 
   export const categoryColumns = [
@@ -43,11 +43,11 @@ import {Tag, Space} from "antd";
     {
       title: 'Action',
       key: 'action',
-      //fixed: 'right',
+      fixed: 'right' as const,
       render: (text, record) => {
         const item = {
           type:'Category',
-          targetUrl: CATEGORY,
+          targetUrl: CATEGORIES,
           itemId:record.key,
           itemName:record.name
         }
@@ -100,6 +100,7 @@ import {Tag, Space} from "antd";
     {
       title: 'Action',
       key: 'action',
+      fixed: 'right' as const,
       render: (text, record) =>{
         const item = {
           type:'Sub-category',
@@ -158,6 +159,7 @@ import {Tag, Space} from "antd";
     {
       title: 'Action',
       key: 'action',
+      fixed: 'right' as const,
       render: (text, record) => {
         const item = {
           type:'Sub-category child',

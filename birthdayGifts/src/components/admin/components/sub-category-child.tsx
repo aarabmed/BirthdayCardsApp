@@ -4,7 +4,7 @@ import Spinner from "../../spin/spiner"
 import useSWR from "swr"
 import axios from 'axios'
 import moment from 'moment'
-import DynamicCategory from '@/components/modals/CategoryType'
+import DynamicCategory from 'components/modals/Category'
 import {childrenColumns } from '../tables/categoryColumns'
 
 

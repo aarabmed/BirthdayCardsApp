@@ -1,5 +1,7 @@
 import {Tag, Space} from "antd";
-
+import EditTag from "components/modals/Tag";
+import DeleteTag from 'components/modals/removeItem'
+import { TAGS } from "@/common/apiEndpoints";
 export const tagColumns = [
         {
           title: 'Name',
@@ -17,19 +19,15 @@ export const tagColumns = [
           key: 'status',
           dataIndex: 'status',
           width:120,
-          render: status => (
-            <>
-              {status.map(elm => {
-                let color = elm? 'green':'volcano'
-                let tag = elm?'Active' : 'Inactive'
-                return (
+          render: status => {
+              let color = status ? 'green':'volcano';
+              let tag = status ? 'Active' : 'Inactive'
+            return(
                   <Tag color={color} key={tag}>
                     {tag.toUpperCase()}
                   </Tag>
-                );
-              })}
-            </>
-          ),
+              );
+          }
         },
         {
             title: 'Date created',
@@ -39,12 +37,20 @@ export const tagColumns = [
         {
           title: 'Action',
           key: 'action',
-          fixed: 'right',
-          render: (text, record) => (
+          fixed: 'right' as const,
+          width: 120,
+          render: (text, record) => {
+          const props = {
+            itemId:record.key,
+            targetUrl:TAGS,
+            itemName:record.name,
+            type: 'Tag'
+          }
+          return(
             <Space size="middle">
-              <a>Edit</a>
-              <a>Delete</a>
+              <EditTag mode='edit' item={record} />
+              <DeleteTag {...props}/>
             </Space>
-          ),
+          )}
         },
       ];

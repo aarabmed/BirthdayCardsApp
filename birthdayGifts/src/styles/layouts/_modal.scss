@@ -75,11 +75,17 @@ margin-left: 25px;
 .warning-modal-container{
     h4{
         font-weight:bold ;
-        margin-bottom: 5px;
+        margin-bottom: 15px;
     }
     p{
+        margin-bottom: 5px;
+        color: #6d6d6e;
         span{
-            background-color: #c2c2c2;
+            background-color: #e5e5e5;
+            border-radius: 3px;
+            padding: 0 5px;
+            font-weight: 500;
+            color: #6d6d6e;
         }
     }
 }

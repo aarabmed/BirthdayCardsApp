@@ -4,7 +4,7 @@ import Router from "next/router"
 import { useSelector, useDispatch } from "react-redux";
 import { MENU_ADMIN } from "../../common/defines-admin";
 
-import Menu from '@/components/header/elements/components/menu'
+import Menu from 'components/header/elements/components/menu'
 
 
 interface Props {

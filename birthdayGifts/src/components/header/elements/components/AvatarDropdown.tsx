@@ -4,7 +4,7 @@ import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons
 import { Avatar, Menu, Spin,Dropdown } from 'antd';
 import Router,{ useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
-import {removeUser} from "@/redux/actions/userActions";
+import {removeUser} from "redux/actions/userActions";
 
 const  AvatarDropdown=()=>{
   const {currentUser} = useSelector((state) => state.userReducer);

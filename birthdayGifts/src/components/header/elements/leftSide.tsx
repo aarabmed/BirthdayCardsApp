@@ -5,8 +5,8 @@ import { useSelector, useDispatch ,batch} from "react-redux";
 import { CloseOutlined } from "@ant-design/icons";
 
 
-import {MENU_ADMIN } from "@/common/defines-admin"
-import Menu from '@/components/header/elements/components/menu'
+import {MENU_ADMIN } from "common/defines-admin"
+import Menu from 'components/header/elements/components/menu'
 
 
 function LeftSide({mobileMenu}) {

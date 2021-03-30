@@ -1,5 +1,9 @@
 module.exports={
-    CATEGORY:'/api/categories',
+    INVITATIONS:'/api/invitations',
+    CARDS:'/api/cards',
+    USERS:'/api/users',
+    TAGS:'/api/tags',
+    CATEGORIES:'/api/categories',
     SUB_CATEGORIES:'/api/sub-categories',
     SUB_CATEGORIES_CHILD:'/api/sub-items',
 }

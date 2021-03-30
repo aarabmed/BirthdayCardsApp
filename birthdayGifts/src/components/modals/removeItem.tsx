@@ -96,14 +96,16 @@ const deleteFunction=({itemId,type,targetUrl,itemName}:itemProps)=>{
           onCancel = {handleCancel}
           onOk={confirmDelete}
           cancelText='Return'
+          width={400}
           okText = {message?'Try again':'Confirm'}
           {...withProps}
           
         >
           {!message?
           <div className="warning-modal-container">
-            <h4>You are about to delete: {type}</h4>
-            <p> a {type} by name : <span style={{fontSize:'bold'}}> {itemName}</span></p>
+            <h4>Are you sure of removing this item? </h4>
+            <p> Type : <span >{type}</span></p> 
+            <p> Name : <span > {itemName}</span></p>
           </div>:<div className='warrningModal'>
             {isDeleted?<SuccussIcon/>:<FailIcon/>}<span> {message}</span>
           </div>

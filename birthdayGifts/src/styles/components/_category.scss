@@ -3,6 +3,12 @@
     display: flex;
 }
 
+.addTag-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .image-uploader{
     width: 100%;
     height: 100%;

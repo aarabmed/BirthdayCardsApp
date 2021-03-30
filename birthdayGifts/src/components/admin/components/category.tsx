@@ -5,16 +5,18 @@ import useSWR,{mutate} from "swr"
 import axios from 'axios'
 import moment from 'moment'
 
-import DynamicCategory from '@/components/modals/CategoryType'
-import {categoryColumns,subCategoryColumns,childrenColumns } from '../tables/categoryColumns'
+import DynamicCategory from 'components/modals/Category'
+import {categoryColumns} from '../tables/categoryColumns'
 import Spinner from '../../spin/spiner'
+import { CATEGORIES } from 'common/apiEndpoints'
 
 
 
 
 const Category=()=>{
     const fetcher = url => axios.get(url).then(res => res.data)
-    const { data,mutate, error } = useSWR('/api/categories', fetcher)
+    const { data,mutate, error } = useSWR(CATEGORIES, fetcher)
+    
     const tableHeader = () =>(
         <div className='tableHeader'>
             <DynamicCategory type='category' mode='add'  runMutate={runMutate}/>

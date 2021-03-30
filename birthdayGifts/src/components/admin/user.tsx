@@ -5,7 +5,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Row, Col,Table, Tag, Space, Button,Spin} from "antd";
 import useSWR,{mutate} from "swr"
 import axios from 'axios'
-import AddUserModal from '../modals/AddUser'
+import AddUserModal from '../modals/addUser'
 import {userColumns } from './tables/userColumns'
 import Spinner from '../spin/spiner'
 import { parseCookies } from "nookies";

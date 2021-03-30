@@ -6,18 +6,20 @@ import axios from 'axios'
 import moment from 'moment'
 
 import {tagColumns } from './tables/tagColumns'
+import AddTag from "../modals/Tag";
 
 
 const TagIndex =()=>{
   const fetcher = url => axios.get(url).then(res => res.data)
+  const { data, error ,mutate} = useSWR('/api/tags', fetcher)
 
-      const tableHeader = () =>(
-      <div className='tableHeader'>
-        <Button type="primary" >Add a Tag</Button>
-      </div>
+  const tableHeader = () =>(
+    <div className='tableHeader'>
+      <AddTag mode='add' runMutate={()=>mutate()} />
+    </div>
   )
+
   const TagPage = () =>{
-    const { data, error } = useSWR('/api/tags', fetcher)
     let newData = [];
 
     if(error){
@@ -27,11 +29,12 @@ const TagIndex =()=>{
     }
     if (!data) return <Spinner />
     else newData = data.data.map(elm=>({
+      ...elm,
       key:elm._id,
       name:elm.name,
       slug:elm.slug,
       createdAt:moment(elm.createdAt).format('DD MMM YYYY'),
-      status:[elm.status],
+      status:elm.status,
     }))
 
 

@@ -37,13 +37,7 @@ import { parseCookies } from 'nookies';
   } 
 
 
-const axiosHeader = ()=>{
-  const {token} = parseCookies()
-  const config = {
-      headers: { Authorization: `Bearer ${token}` }
-  };
-  return config
-}
+
 
 const requestData =(url:string) =>{
   const {token} = parseCookies()
@@ -57,7 +51,7 @@ const requestData =(url:string) =>{
 }
 
 
-const addCategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
+const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
   const fetcher = url => axios.get(url,axiosHeader()).then(res => res.data)
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -186,7 +180,6 @@ const addCategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
           formData,
           axiosHeader(),
         ).then(res=>{
-          console.log('Cat-res:',res)
             if (res.status===201) {
                 setTimeout(() => {
                   setIsModalVisible(false);
@@ -234,8 +227,6 @@ const addCategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
     });
 
 
-    console.log('URL:',`${url}/${item.key}`)
-
       axiosInstance.patch(
         `${url}/${item.key}`,
         formData,
@@ -243,9 +234,10 @@ const addCategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
       ).then(res=>{
         console.log('Cat-res:',res)
           if (res.status===201) {
-              mutate(url)
+              
               setTimeout(() => {
                 setIsModalVisible(false);
+                mutate(url)
                 setConfirmLoading(false);
                 form.resetFields();
               }, 1000);
@@ -631,4 +623,4 @@ const addCategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
     </>
   );
 }
-export default React.memo(addCategoryType)
+export default React.memo(CategoryType)
