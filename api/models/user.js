@@ -30,6 +30,18 @@ const userSchema = new Schema({
         type:Boolean,
         default:false
     },
+    statusUpdatedBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
+    deletedBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
+    updatedBy:{
+        type:Schema.Types.ObjectId,
+        ref:'User'
+    },
     validToken:{
         type:Boolean,
     }

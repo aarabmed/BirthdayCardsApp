@@ -1,7 +1,7 @@
 import {Tag, Space} from "antd";
 import EditTag from "components/modals/Tag";
-import DeleteTag from 'components/modals/removeItem'
-import { TAGS } from "@/common/apiEndpoints";
+import DeleteTag, { deleteProps } from 'components/modals/removeItem'
+import { TAGS } from "common/apiEndpoints";
 export const tagColumns = [
         {
           title: 'Name',
@@ -40,11 +40,12 @@ export const tagColumns = [
           fixed: 'right' as const,
           width: 120,
           render: (text, record) => {
-          const props = {
+          const props:deleteProps = {
             itemId:record.key,
             targetUrl:TAGS,
             itemName:record.name,
-            type: 'Tag'
+            type: 'Tag',
+            button: 'link'
           }
           return(
             <Space size="middle">

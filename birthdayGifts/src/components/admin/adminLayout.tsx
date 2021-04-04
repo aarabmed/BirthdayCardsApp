@@ -20,16 +20,16 @@ const Categories = dynamic(
   import('./category')
 )
 
+
 const AdminLayout:React.FC<props> =({
   pageType,
 })=>{
 
-  const renderPage= (pageType):React.ReactNode=>{
-
-    switch (pageType) {
+  const RenderPage:React.FC<{type:string}>= ({type})=>{
+    switch (type) {
       case 'users':
         return(
-          <User/>
+          <User />
         )
   
       case 'cards':
@@ -50,9 +50,9 @@ const AdminLayout:React.FC<props> =({
   }
   
   return (
-    <Row gutter={[0,10]} className={'content-page'}>
-          <Col>
-            {renderPage(pageType)}
+    <Row gutter={[0,10]} className={'main-page'}>
+          <Col className='main-content'>
+            <RenderPage type={pageType} />
           </Col>
     </Row>
 );

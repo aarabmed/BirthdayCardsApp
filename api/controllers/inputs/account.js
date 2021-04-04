@@ -70,5 +70,13 @@ exports.signupInputs ={
             }
         ]
     },
+    statusProperties:{
+        inputName:'status',
+        validation:[
+            {
+                isBoolean:true
+            },
+        ]
+    },
 }
 

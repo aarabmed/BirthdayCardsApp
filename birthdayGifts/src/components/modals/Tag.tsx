@@ -106,16 +106,16 @@ const addTag:React.FC<Props> =({item,mode,runMutate}) => {
   };
 
   const onCreate = (values:tagType) => { 
-      setConfirmLoading(true);
-      const newValues = {...values,currentUserId:userId}
-      const axiosInstance = axios.create({
-        validateStatus: function (status)
-        {
-            return true
-        }
-      });
-      //const url = mode==='edit'?`/api/categories/`:'/api/categories/new'
-         axiosInstance.post(
+        setConfirmLoading(true);
+        const newValues = {...values,currentUserId:userId}
+        const axiosInstance = axios.create({
+          validateStatus: function (status)
+          {
+              return true
+          }
+        });
+        
+        axiosInstance.post(
           `${TAGS}/new`,
           newValues,
           axiosHeader(),

@@ -6,11 +6,12 @@ import axios from 'axios'
 import moment from 'moment'
 import DynamicCategory from 'components/modals/Category'
 import {childrenColumns } from '../tables/categoryColumns'
+import { SUB_CATEGORIES_CHILD } from "common/apiEndpoints";
 
 
 const SubCategoryChild=()=>{
     const fetcher = url => axios.get(url).then(res => res.data)
-    const { data, error ,mutate } = useSWR('/api/sub-items', fetcher)
+    const { data, error ,mutate } = useSWR(SUB_CATEGORIES_CHILD, fetcher)
 
     const tableHeader = () =>(
         <div className='tableHeader'>
@@ -20,9 +21,9 @@ const SubCategoryChild=()=>{
 
     const runMutate =()=> mutate()
 
-    const items = () =>{
+    const Children = () =>{
         let newData = [];
-        
+        console.log('DATA:',data)
         if(error){
         return (
             <h5>No data to load !!</h5>
@@ -43,14 +44,14 @@ const SubCategoryChild=()=>{
 
     
         return(
-           <><Table className='userTable' columns={childrenColumns} dataSource={newData} scroll={{x:1170}} title={()=>tableHeader()}/></>
+           <><Table columns={childrenColumns} dataSource={newData} scroll={{x:1170}} title={()=>tableHeader()}/></>
         )
     }
 
     return (
-        <div>
-            {items()}
-        </div>
+        <>
+            <Children/>
+        </>
     );
 } 
 

@@ -10,6 +10,7 @@ import homeIcon from './home'
 import tagIcon from './tag'
 import failIcon from './fail';
 import successIcon from './success'
+import backIcon from './back'
 
 export default {
      cardsIcon, 
@@ -23,5 +24,6 @@ export default {
      homeIcon,
      tagIcon,
      failIcon,
-     successIcon
+     successIcon,
+     backIcon
  }

@@ -10,6 +10,7 @@
   display: flex;
   flex-flow: column;
   height: 100%;
+  overflow-x: hidden;
 }
 
 
@@ -19,16 +20,21 @@
   transition: all .4s ease-in-out 0s;
   text-align: right;
 }
-.userTable{
-  //padding-left: 15px;
+
+.userTable {
+  width: 95%;
+  padding: 0 15px;
+  left: 40px;
+  top: 40px;
+  position: relative;
 }
 
 
-.userTable > .ant-spin-nested-loading > .ant-spin-container > .ant-table {
+.main-content > .ant-spin-nested-loading > .ant-spin-container > .ant-table {
   font-size: 14px;
 }
 
-.userTable:hover{
+.main-content>.ant-table-wrapper:hover{
   box-shadow: 0 1px 15px 1px rgba(69,65,78,.08);
   transition: all .4s ease-in-out 0s;
 }

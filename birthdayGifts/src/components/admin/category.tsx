@@ -17,15 +17,18 @@ const SubCategoryChild = dynamic(
 
 const CategoryIndex =()=>{
   return (
-            <Space size={40} direction={'vertical'}>
+          <>
+            <Space size={40} direction='vertical'>
                 <h3 className='contentTitle'>{'< '}Category Management </h3>
+            </Space>
+            <>
                 <Category/>
                   <Divider/>
                 <SubCategory/>
                   <Divider/>
                 <SubCategoryChild/>
-            </Space>
-            
+            </>
+          </> 
   );
 } 
 

@@ -13,7 +13,7 @@ const session = ironSession({
 const checkAuth = require("../middlewares/auth")
 const router = express.Router();
 
- const  {getUser,getAllUsers, updateUser,deleteUser}= require('../controllers/user')
+ const  {getUser,getAllUsers, updateUser,deleteUser,upgradeUser,downgradeUser,setUserStatus}= require('../controllers/user')
 
 
 router.get("/",checkAuth, getAllUsers);
@@ -21,6 +21,12 @@ router.get("/",checkAuth, getAllUsers);
 router.get("/:id",checkAuth, getUser);
 
 router.patch("/:id",checkAuth, updateUser);
+
+router.patch("/status/:id",checkAuth, setUserStatus);
+
+router.patch("/upgrade/:id",checkAuth, upgradeUser);
+
+router.patch("/downgrade/:id",checkAuth, downgradeUser);
 
 router.patch("/delete/:id",checkAuth, deleteUser);
 

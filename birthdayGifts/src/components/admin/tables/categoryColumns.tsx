@@ -1,6 +1,6 @@
-import ModalView from 'components/modals/ViewCategory'
+import ModalView from 'components/modals/viewCategory'
 import EditCategory from 'components/modals/Category'
-import DeleteComponent from 'components/modals/removeItem'
+import DeleteComponent, { deleteProps } from 'components/modals/removeItem'
 import {CATEGORIES,SUB_CATEGORIES_CHILD,SUB_CATEGORIES} from 'common/apiEndpoints'
 import {Tag, Space} from "antd";
 
@@ -45,11 +45,12 @@ import {Tag, Space} from "antd";
       key: 'action',
       fixed: 'right' as const,
       render: (text, record) => {
-        const item = {
+        const item:deleteProps = {
           type:'Category',
           targetUrl: CATEGORIES,
           itemId:record.key,
-          itemName:record.name
+          itemName:record.name,
+          button:'link'
         }
         return(
           <Space size="middle">
@@ -102,11 +103,12 @@ import {Tag, Space} from "antd";
       key: 'action',
       fixed: 'right' as const,
       render: (text, record) =>{
-        const item = {
+        const item:deleteProps = {
           type:'Sub-category',
           targetUrl: SUB_CATEGORIES,
           itemId:record.key,
-          itemName:record.name
+          itemName:record.name,
+          button:'link'
         }
         return(
         <Space size="middle">
@@ -161,11 +163,12 @@ import {Tag, Space} from "antd";
       key: 'action',
       fixed: 'right' as const,
       render: (text, record) => {
-        const item = {
+        const item:deleteProps = {
           type:'Sub-category child',
           targetUrl: SUB_CATEGORIES_CHILD,
           itemId:record.key,
-          itemName:record.name
+          itemName:record.name,
+          button:'link'
         }
         return (
         <Space size="middle">

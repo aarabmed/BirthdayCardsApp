@@ -14,6 +14,7 @@ import { Modal, Button,Form,
   Spin
 } from "antd";
 import { parseCookies } from 'nookies';
+import { CATEGORIES, SUB_CATEGORIES, SUB_CATEGORIES_CHILD, TAGS } from 'common/apiEndpoints';
 
   
 
@@ -68,11 +69,11 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
   
   const getUrl = ()=>{
     if(type==='category'){
-      return '/api/categories'
+      return CATEGORIES
     }else if(type==='sub-category'){
-      return '/api/sub-categories'
+      return SUB_CATEGORIES
     }else{
-      return '/api/sub-items'
+      return SUB_CATEGORIES_CHILD
     }
   }
 
@@ -174,7 +175,6 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
             return true
         }
       });
-      //const url = mode==='edit'?`/api/categories/`:'/api/categories/new'
          axiosInstance.post(
           `${url}/new`,
           formData,
@@ -274,7 +274,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
   const CategoryForm:React.FC= ()=>{
     const [loading, setLoading] = useState(true)
 
-    const response = useSWR('/api/sub-categories', fetcher)
+    const response = useSWR(SUB_CATEGORIES, fetcher)
 
     
     let subCategoryInitial = mode === 'edit'? response.data.data.filter(e=>item.subCategory.includes(e.name)).map(e=>e._id) : [];
@@ -377,7 +377,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
     let subChildrenOpitons = [];
     let subChildrenInitialValues= [];
 
-    const responseTag = requestData('/api/tags')
+    const responseTag = requestData(TAGS)
 
 
     if(responseTag.data) {
@@ -385,7 +385,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
       mode === 'edit' ? tagsInitialValues = tagsOptions.filter(e=>item.tags.includes(e.label)).map(e=>e.value):[]
     }
     
-    const responseSubCategoryChild = requestData('/api/sub-items');
+    const responseSubCategoryChild = requestData(SUB_CATEGORIES_CHILD);
 
     if(responseSubCategoryChild.data){
       subChildrenOpitons = responseSubCategoryChild.data.data.map(e=>({label:e.name,value:e._id}))
@@ -488,7 +488,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
 
   
   const SubCategoryChildForm:React.FC = ()=>{
-    const responseTag = requestData('/api/tags')
+    const responseTag = requestData(TAGS)
     const[ loading , setLoading] = useState(true)
 
     let tagsOptions = [];

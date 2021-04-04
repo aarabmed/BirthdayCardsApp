@@ -27,11 +27,15 @@
 
 .content-side{
   padding: 1rem 1rem 1rem 1rem;
-  overflow: auto;
-  
 }
 
-.content-page{
+.main-page{
+  .ant-col{
+    width: 100%;
+    display: unset;
+    align-items: end;
+    flex-direction: column;
+  }
   //height: 100%;
   width: 98%;
 }
@@ -39,6 +43,19 @@
   width: 100%;
   min-height: 100%;;
 }
+
+
+.main-content{
+  width: 95%;
+  padding: 0 15px;
+  @media (min-width: 820px) {
+    left:40px
+  }
+  top: 40px;
+  position: relative;
+}
+
+
 
 .spinner{
   text-align: center;

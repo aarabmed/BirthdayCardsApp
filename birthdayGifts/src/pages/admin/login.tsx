@@ -14,6 +14,7 @@ import {setUser} from "../../redux/actions/userActions";
 
 
 import LoginFrom from '../../components/login';
+import { LOGIN } from 'common/apiEndpoints';
 
 
 const { UserName, Password, Submit } = LoginFrom;
@@ -29,7 +30,7 @@ export interface StateType {
   currentAuthority?:'user'|'guest';
 } 
 
-export interface Data {
+export interface User {
   userId,
   userName,
   token,
@@ -39,7 +40,7 @@ export interface Data {
 
 
 interface Response {
-  data?:Data;
+  data?:User;
   status?:number;
   message?:string;
 } 
@@ -107,7 +108,7 @@ const Login: React.FC<LoginProps> = (props) => {
     }
 
     const {status,message,data}:Response = await fetch(
-      '/api/account/login',{
+      LOGIN,{
         method: 'POST',
         body: JSON.stringify(values),
         headers: { 'Content-Type': 'application/json' }

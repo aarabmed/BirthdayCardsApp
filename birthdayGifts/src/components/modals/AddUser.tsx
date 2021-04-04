@@ -9,6 +9,7 @@ import { Modal, Button,Form,
 import AvatarInput from './components/avatarInput';
 import axios from 'axios'
 import {withAuth} from '../../context/helper'
+import { SIGNUP } from 'common/apiEndpoints';
 
 
  const addUser = ({fetching}) => {
@@ -47,7 +48,7 @@ import {withAuth} from '../../context/helper'
         const data = {...values,currentUserId:userId}
   
         axios({
-            url:'/api/account/signup',
+            url:SIGNUP,
             data,
             method:'post',
             validateStatus: (status) =>{
@@ -82,12 +83,12 @@ import {withAuth} from '../../context/helper'
     const options =()=>{
         console.log('AUTHORITY:',authority)
         const superAdminOptions  = [
-            {label:'USER',value:"USER"},
+            {label:'REGULAR',value:"REGULAR"},
             {label:'ADMIN',value:"ADMIN"},
             {label:'SUPER ADMIN',value:"SUPER_ADMIN"}
         ]
         const adminOptions = [
-            {label:'USER',value:"USER"},
+            {label:'REGULAR',value:"REGULAR"},
             {label:'ADMIN',value:"ADMIN"},
         ]
 

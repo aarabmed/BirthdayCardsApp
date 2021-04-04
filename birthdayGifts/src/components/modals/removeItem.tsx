@@ -9,17 +9,20 @@ import { mutate } from 'swr';
 import checkAuth from 'common/auth'
 import redirectToLogin from 'common/redirectToLogin'
 
-type itemProps ={
+type DeleteButton = 'link'|'regular'
+export type deleteProps ={
   itemId:string,
   itemName:string,
   targetUrl:string,
   type:string,
+  button:DeleteButton,
+  onDelete?:()=>void,
 }
 
 const SuccussIcon  = ()=> <Icon component={Icons.successIcon} />
 const FailIcon  = ()=> <Icon component={Icons.failIcon} />
 
-const deleteFunction=({itemId,type,targetUrl,itemName}:itemProps)=>{
+const deleteFunction=({itemId,type,targetUrl,itemName,button,onDelete}:deleteProps)=>{
      const {currentUser} = useSelector((state) => state.userReducer);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -28,6 +31,9 @@ const deleteFunction=({itemId,type,targetUrl,itemName}:itemProps)=>{
 
     const handleCancel =()=>{
         setVisible(false)
+        if(isDeleted){
+          onDelete()
+        }
     }
 
     const showModal = async ()=>{
@@ -56,7 +62,6 @@ const deleteFunction=({itemId,type,targetUrl,itemName}:itemProps)=>{
             return true
         }
       });
-      //const url = mode==='edit'?`/api/categories/`:'/api/categories/new'
          axiosInstance.patch(
           `${targetUrl}/delete/${itemId}`,
           {currentUserId:userId},
@@ -73,7 +78,7 @@ const deleteFunction=({itemId,type,targetUrl,itemName}:itemProps)=>{
             }else{
                 setConfirmLoading(false);
                 setIsDeleted(false)
-                setMessage(res.data.error.message)
+                setMessage(res.data.message)
             }
         }).catch(e=>{
             console.log('Error:',e)
@@ -85,8 +90,8 @@ const deleteFunction=({itemId,type,targetUrl,itemName}:itemProps)=>{
     }:{}
 
     return(
-    <div>
-      <a onClick={showModal}> delete </a>
+    <>
+      {button==='link'?<a onClick={showModal}> delete </a>:<Button key="1111" type='primary' danger onClick={showModal}>Delete</Button>}
       <Modal
           destroyOnClose={true}
           title={false}
@@ -112,7 +117,7 @@ const deleteFunction=({itemId,type,targetUrl,itemName}:itemProps)=>{
           }
 
       </Modal>
-    </div>
+    </>
     )
 }
 

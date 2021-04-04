@@ -24,7 +24,7 @@ const Category=()=>{
     )
 
     const runMutate =()=> mutate()
-    const categories = () =>{
+    const Categories = () =>{
         
         let newData = [];
         
@@ -48,14 +48,14 @@ const Category=()=>{
         }))
 
         return(
-            <Table className='userTable' scroll={{x:1170}} columns={categoryColumns} dataSource={newData}  title={()=>tableHeader()}/>
+            <Table  scroll={{x:1170}} columns={categoryColumns} dataSource={newData}  title={()=>tableHeader()}/>
         )
     }
 
     return (
-        <div>
-            {categories()}
-        </div>
+        <>
+            <Categories/>
+        </>
     );
 } 
 

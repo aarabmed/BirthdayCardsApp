@@ -7,11 +7,12 @@ import moment from 'moment'
 
 import {tagColumns } from './tables/tagColumns'
 import AddTag from "../modals/Tag";
+import { TAGS } from "common/apiEndpoints";
 
 
 const TagIndex =()=>{
   const fetcher = url => axios.get(url).then(res => res.data)
-  const { data, error ,mutate} = useSWR('/api/tags', fetcher)
+  const { data, error ,mutate} = useSWR(TAGS, fetcher)
 
   const tableHeader = () =>(
     <div className='tableHeader'>
@@ -39,15 +40,11 @@ const TagIndex =()=>{
 
 
     return(
-        <Table className='userTable' columns={tagColumns} dataSource={newData} scroll={{x:1170}} title={tableHeader}/>
+        <Table columns={tagColumns} dataSource={newData} scroll={{x:1170}} title={tableHeader}/>
     )
   }
 
-  return (
-          <div>
-             {TagPage()}
-          </div>
-  );
+  return <TagPage/>
 } 
 
 export default TagIndex

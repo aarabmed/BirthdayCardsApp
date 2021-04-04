@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Icon,{ LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import Language from 'assets/icons'
+import Icons from 'assets/icons'
 import { Avatar, Menu, Spin } from 'antd';
 
 
 const { SubMenu } = Menu;
 
-const FrenchIcon =()=> <Icon component={Language.franceIcon} />;
-const ArabicIcon =()=>  <Icon component={Language.arabicIcon}/>
-const EnglishIcon =()=> <Icon component={Language.englishIcon} />;
+const FrenchIcon =()=> <Icon component={Icons.franceIcon} />;
+const ArabicIcon =()=>  <Icon component={Icons.arabicIcon}/>
+const EnglishIcon =()=> <Icon component={Icons.englishIcon} />;
 
 const  SelectLang =()=>{
   const [lang, setLang] = useState('Ar');
