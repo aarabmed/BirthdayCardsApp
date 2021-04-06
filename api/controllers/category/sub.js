@@ -82,7 +82,7 @@ exports.createSubCategory = async (req, res, next) => {
         image:newImage,
         status:true,
         slug:newSlug,
-        children:subChildren,
+        childrenSubCategory:subChildren,
         createdBy:currentUserId,
         tags
     })
@@ -111,6 +111,8 @@ exports.createSubCategory = async (req, res, next) => {
 
 //! ----- EDIT A CATEGORY ----------
 exports.updateSubCategory = async (req, res, next) => {
+
+    console.log('REQ:',req.body)
     const currentUserId = req.body.currentUserId
     const subCategoryId = req.params.id;
     const name = req.body.name;
@@ -120,7 +122,7 @@ exports.updateSubCategory = async (req, res, next) => {
     const subCategoryImage = req.file??'';
     const tags = req.body.tags ? JSON.parse(req.body.tags):[]
     //const category = req.body.category??[]
-    const subChildren = req.body.subChildren ? JSON.parse(req.body.subCategory):[]
+    const subChildren = req.body.subChildren ? JSON.parse(req.body.subChildren):[]
 
     
 
@@ -179,7 +181,7 @@ exports.updateSubCategory = async (req, res, next) => {
     subCategory.slug = newSlug;
     subCategory.status = status
     subCategory.tags=tags;
-    subCategory.children=subChildren
+    subCategory.childrenSubCategory=subChildren
     subCategory.updatedBy=currentUserId
     // subCategory.category=category
 

@@ -9,19 +9,28 @@ const {nameProperties,statusProperties,descriptionProperties,imageProperties,slu
 
 //! ----- RETRIEVE A SINGLE CATEGORY ----------
 /* exports.getCategory = async (req, res, next) => {
-
+childrenSubCategory
 } */
 
 //! ----- RETRIEVE ALL CATEGORIES ----------
 exports.getAllCategories = async (req, res, next) => {
     const categories = await Category.find({deleted:false})
         .populate([
-            {path:"subCategory",select:"tags name _id",model:'SubCategory',match:{deleted:false},
-                populate:{
-                    path:"children",
-                    select:"tags name -id",
-                    match:{deleted:false}
-                }
+            {path:"subCategory",select:"name ",model:'SubCategory',match:{deleted:false},
+                populate:[{
+                    path:"childrenSubCategory",
+                    select:"name",
+                    match:{deleted:false},
+                    populate:{
+                        path:"tags",
+                        select:"name",
+                        match:{deleted:false},
+                    },
+                },{
+                    path:"tags",
+                    select:"name",
+                    match:{deleted:false},
+                }],
             }
         ]);
     if(!categories){

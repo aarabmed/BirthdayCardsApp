@@ -33,8 +33,20 @@ const Category=()=>{
                 <h5>No data to load !!</h5>
             )
         }
+        console.log('TAGS::::',data);
+
         if (!data) return <Spinner />
-        else newData = data.data.map(elm=>({
+        else newData = data.data.map(elm=>{
+            let tagsChildren = []
+            let tagsSubCat = []
+            let subChildren =[]
+
+            elm.subCategory.map(e=>e.tags.map(i=>tagsSubCat.push(i)))
+            elm.subCategory.map(sub=>sub.childrenSubCategory.map(e=>e.tags.map(i=>tagsChildren.push(i))))
+            elm.subCategory.map(sub=>sub.childrenSubCategory.map(e=>subChildren.push({_id:e._id,name:e.name})))
+
+            console.log('ALL-subChildren:',subChildren)
+           return ({
             ...elm,
             key:elm._id,
             name:elm.name,
@@ -43,9 +55,11 @@ const Category=()=>{
             createdAt:moment(elm.createdAt).format('DD MMM YYYY'),
             updatedAt:moment(elm.updatedAt).format('DD MMM YYYY'),
             status:elm.status,
-            tags:elm.subCategory.map(e=>[...e.tags.map(el=>el.name)])[0]??[],
-            subCategory:elm.subCategory.map(e=>e.name)
-        }))
+            childrenSubCategory:subChildren,
+            subCategory:elm.subCategory.map(e=>({name:e.name,_id:e._id})),
+            tags:[...new Map([...tagsChildren,...tagsSubCat].map(item => [item['_id'], item])).values()],
+            })
+        })
 
         return(
             <Table  scroll={{x:1170}} columns={categoryColumns} dataSource={newData}  title={()=>tableHeader()}/>

@@ -40,6 +40,7 @@ const SubCategory=()=>{
         updatedAt:moment(elm.updatedAt).format('DD MMM YYYY'),
         childrenSubCategory:elm.childrenSubCategory,
         status:elm.status,
+        tags:elm.tags.map(e=>({name:e.name,_id:e._id})),
         }))
 
     

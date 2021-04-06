@@ -18,6 +18,11 @@ import { CATEGORIES, SUB_CATEGORIES, SUB_CATEGORIES_CHILD, TAGS } from 'common/a
 
   
 
+  type Obj = {
+    _id:string,
+    name:string
+  }
+
   type categoryType ={
     key?:string,
     name:string,
@@ -25,9 +30,9 @@ import { CATEGORIES, SUB_CATEGORIES, SUB_CATEGORIES_CHILD, TAGS } from 'common/a
     slug:string,
     status:boolean,
     image:File|string,
-    tags?:string[],
-    subCategory?:string[],
-    childrenSubCategory?:string[]
+    tags?:[Obj],
+    subCategory?:[Obj],
+    childrenSubCategory?:[Obj]
   }
 
   type Props ={
@@ -40,14 +45,14 @@ import { CATEGORIES, SUB_CATEGORIES, SUB_CATEGORIES_CHILD, TAGS } from 'common/a
 
 
 
-const requestData =(url:string) =>{
+const requestData =  (url:string) =>{
   const {token} = parseCookies()
   const config = {
       headers: { Authorization: `Bearer ${token}` }
   };
   const fetcher = url => axios.get(url,config).then(res => res.data)
 
-  const {data,error} = useSWR(url, fetcher)
+  const {data,error} =  useSWR(url, fetcher)
   return {data,error}
 }
 
@@ -273,11 +278,11 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
 
   const CategoryForm:React.FC= ()=>{
     const [loading, setLoading] = useState(true)
-
+    let SubCategoiresOptions = []
     const response = useSWR(SUB_CATEGORIES, fetcher)
 
-    
-    let subCategoryInitial = mode === 'edit'? response.data.data.filter(e=>item.subCategory.includes(e.name)).map(e=>e._id) : [];
+    SubCategoiresOptions = response.data.data.map(e=>({label:e.name,value:e._id}))
+    let subCategoryInitial = mode === 'edit'? SubCategoiresOptions.filter(e=>item.subCategory.some(sub=>sub._id===e.value)).map(e=>e.value) : [];
     if(loading){
       setLoading(false)
     }
@@ -290,9 +295,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
       }
     },[refForm.current])
 
-    const SubCategoiresOptions= ()=>{ 
-      return response.data.data.map(e=>({label:e.name,value:e._id}))??[]
-    }
+  
 
 
     return(
@@ -359,7 +362,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                   label="Sub-category" 
                   rules={[{type:'array'}]}
                   >
-                  <Select mode="multiple" options={SubCategoiresOptions()} loading={loading} />
+                  <Select mode="multiple" options={SubCategoiresOptions} loading={loading} />
               </Form.Item>
           </div>
     </Form>
@@ -370,36 +373,43 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
 
   const SubCategoryForm:React.FC = ()=>{
    
-    const [loading, setLoading] = useState(true)
+    const [loadingTag, setLoadingTag] = useState(true)
+    const [loadingSubCat, setLoadingSubCat] = useState(true)
 
     let tagsOptions = [];
-    let tagsInitialValues = [];
     let subChildrenOpitons = [];
+    let tagsInitialValues = [];
     let subChildrenInitialValues= [];
 
-    const responseTag = requestData(TAGS)
 
+      const responseTag =  requestData(TAGS)
 
-    if(responseTag.data) {
-      tagsOptions = responseTag.data.data.map(e=>({label:e.name,value:e._id}))
-      mode === 'edit' ? tagsInitialValues = tagsOptions.filter(e=>item.tags.includes(e.label)).map(e=>e.value):[]
-    }
-    
-    const responseSubCategoryChild = requestData(SUB_CATEGORIES_CHILD);
-
-    if(responseSubCategoryChild.data){
-      subChildrenOpitons = responseSubCategoryChild.data.data.map(e=>({label:e.name,value:e._id}))
-      mode === 'edit' ? subChildrenInitialValues = subChildrenOpitons.filter(e=>item.childrenSubCategory.includes(e.label)).map(e=>e.value):[]
-      if(loading){
-        setLoading(false)
+      if(responseTag.data) {
+        tagsOptions = responseTag.data.data.map(e=>({label:e.name,value:e._id}))
+        mode === 'edit' ? tagsInitialValues = tagsOptions.filter(e=>item.tags.some(tag=>tag.name===e.label)).map(e=>e.value):[]
+        if(loadingTag){
+          setLoadingTag(false)
+        }
       }
-    }
+
+      const responseSubChild = requestData(SUB_CATEGORIES_CHILD)
+
+      if(responseSubChild.data){
+        subChildrenOpitons = responseSubChild.data.data.map(e=>({label:e.name,value:e._id}))
+        mode === 'edit' ? subChildrenInitialValues = subChildrenOpitons.filter(e=>item.childrenSubCategory.some(sub=>sub.name===e.label)).map(e=>e.value):[]
+        if(loadingSubCat){
+          setLoadingSubCat(false)
+        }
+      } 
+     
+      
 
     useEffect(()=>{
      if(item){
       const {name,slug,description,status,image} = item;
-      if(refForm.current && !confirmLoading){
-        form.setFieldsValue({status,slug,name,image,description,subChildren:subChildrenInitialValues,tags:tagsInitialValues})
+      if(refForm.current&&!loadingTag&&!loadingSubCat&&!confirmLoading){
+        form.setFieldsValue({status,slug,name,image,description,childrenSubCategory:subChildrenInitialValues,tags:tagsInitialValues})
+        console.log('EFFECT RUNED')
       }
      }
     },[refForm.current])
@@ -465,18 +475,18 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                         </Form.Item>
                       )}
                       <Form.Item
-                          name="subChildren"
+                          name="childrenSubCategory"
                           label="Sub-children"
                           rules={[{type:'array'}]}
                       >
-                          <Select mode='multiple' options={subChildrenOpitons} loading={loading} />
+                          <Select mode='multiple' options={subChildrenOpitons} loading={loadingSubCat} />
                       </Form.Item>
                       <Form.Item 
                           name="tags" 
                           label="tags" 
                           rules={[{type:'array'}]}
                           >
-                          <Select mode='multiple' options={tagsOptions} loading={loading} />
+                          <Select mode='multiple' options={tagsOptions} loading={loadingTag} />
                       </Form.Item>
                   </div>
       </Form>
@@ -497,7 +507,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
     console.log('tagsInitialValues:',responseTag)
     if(responseTag.data) {
       tagsOptions = responseTag.data.data.map(e=>({label:e.name,value:e._id}))
-      mode === 'edit'? tagsInitialValues = tagsOptions.filter(e=>item.tags.includes(e.label)).map(e=>e.value):[]
+      mode === 'edit'? tagsInitialValues = tagsOptions.filter(e=>item.tags.some(tag=>tag.name===e.label)).map(e=>e.value):[]
       if(loading){
         setLoading(false)
       }

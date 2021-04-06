@@ -43,27 +43,32 @@ const ModalView = (props) => {
   const convert =({type,record})=>{
     const value = record;
     let newObject:category = {
-      name:<span>{value.name}</span>,
+      name:<span key='1'>{value.name}</span>,
       slug:<span>{value.slug}</span>,
-      status:<Tag color={value.status? 'green':'red'}>{value.status?'Active' : 'Inactive'}</Tag>,
       createdAt:<span>{value.createdAt}</span>,
       lastUpdate:<span>{value.updatedAt}</span>,
+      status:<Tag color={value.status? 'green':'red'}>{value.status?'Active' : 'Inactive'}</Tag>,
     }
-
     if(type==='category'){
       newObject = {
         ...newObject,
-        tags:value.tags.length?[value.tags.map((item,index)=>(<Tag color="magenta" key={index}>{item}</Tag>))]:[<span key='111'>no tag associated</span>],
-        subCategory:value.subCategory.length?[value.subCategory.map((item,index)=>(<Tag color="blue" key={index}>{item}</Tag>))]:[<span key='111'>no sub-category associated</span>]
+        createdAt:null,
+        subCategory:value.subCategory.length?[value.subCategory.map((item)=>(<Tag color="blue" key={item._id}>{item.name}</Tag>))]:[<span key='111'>no sub-category associated</span>],
+        childrenSubCategory:value.childrenSubCategory.length?[value.childrenSubCategory.map((item)=>(<Tag color="success" key={item._id}>{item.name}</Tag>))]:[<span key='111'>no sub-items associated</span>],
       }
     }
     if(type==='subCategory'){
       newObject = {
         ...newObject,  
-        tags:value.tags.length?[value.tags.map((item,index)=>(<Tag color="magenta" key={index}>{item}</Tag>))]:[<span key='111'>no tag associated</span>],   
-        childrenSubCategory:value.childrenSubCategory.length?[value.childrenSubCategory.map((item,index)=>(<Tag color="success" key={index}>{item}</Tag>))]:[<span key='111'>no sub-items associated</span>],
+        childrenSubCategory:value.childrenSubCategory.length?[value.childrenSubCategory.map((item)=>(<Tag color="success" key={item._id}>{item.name}</Tag>))]:[<span key='111'>no sub-items associated</span>],
       }
     }
+
+    newObject={
+      ...newObject,
+      tags:value.tags.length?[value.tags.map((item)=>(<Tag color="magenta" key={item._id}>{item.name}</Tag>))]:[<span key='111'>no tag associated</span>],
+    }
+    
 
     setData(newObject);
   }
@@ -83,7 +88,7 @@ const ModalView = (props) => {
         return 'Status'
       case 'subCategory':
           return 'Sub-Categories'
-      case 'children':
+      case 'childrenSubCategory':
         return 'Sub-Category-items'
       case 'tags':
         return 'Tags'
@@ -98,6 +103,7 @@ const ModalView = (props) => {
   const {record,name} = props
   return (
     <>
+    {console.log('SUB_DATA:',data)}
       <a onClick={showModal}>{name}</a>
       <Modal visible={isModalVisible} onCancel={handleCancel} footer={null} width={820}>
         <div className='category-modal-container'>
