@@ -28,12 +28,13 @@ exports.getCard = async (req, res, next) => {
 
 //! ----- RETRIEVE ALL CARDS ----------
 exports.getAllCards = async (req, res, next) => {
-    const page = req.body.page;
-    const size = req.body.size;
+    const page = req.query.pageNumber||1;
+    const size = req.query.size||10;
+
     const { limit,offset } = getPagination(page,size)
 
     const results = await Card.paginate({deleted:false},{offset,limit,sort:{createdAt:-1},populate:['tags','category']})
-    
+
     return res.status(200).json({
         data:results.docs,
         currentPage:results.page,
@@ -117,7 +118,8 @@ exports.createCard = async (req, res, next) => {
     }
     const newTitle= title.split(' ').map(capitalize).join(' ');
     const newSlug= slug.split(' ').join('-').toLowerCase();
-    
+
+
     const card = new Card({
         title:newTitle,
         slug:newSlug,

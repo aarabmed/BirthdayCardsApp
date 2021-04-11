@@ -4,13 +4,13 @@ import { useSelector} from "react-redux";
 import {Table} from "antd";
 import useSWR from "swr"
 import axios from 'axios'
-import AddUserModal from '../modals/addUser'
-import {userCol } from './tables/userColumns'
-import Spinner from '../spin/spiner'
+import AddUserModal from './modals/addUser'
+import {userCol } from './components/userColumns'
+import Spinner from '../../spin/spiner'
 import { parseCookies } from "nookies";
 import { USERS } from "common/apiEndpoints";
 
-import UserHeader from './components/user/userHeader'
+import UserHeader from './components/userHeader'
 
 const axiosHeader = ()=>{
   const {token} = parseCookies()

@@ -43,7 +43,6 @@ export const userCol = (callBack)=>{
           key: 'action',
           fixed: 'right',
           render: (text,record) => {
-            console.log('RECORD:',record)
             return(
             <Space size="middle" >
               <a onClick={()=>callBack(record)}>view</a>

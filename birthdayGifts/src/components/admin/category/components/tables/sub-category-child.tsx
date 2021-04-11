@@ -1,11 +1,11 @@
 import React from "react";
 import {Table,Button} from "antd";
-import Spinner from "../../spin/spiner"
+import Spinner from "../../../../spin/spiner"
 import useSWR from "swr"
 import axios from 'axios'
 import moment from 'moment'
-import DynamicCategory from 'components/modals/Category'
-import {childrenColumns } from '../tables/categoryColumns'
+import DynamicCategory from 'components/admin/category/components/categoryType'
+import {childrenColumns } from './columns/categoryColumns'
 import { SUB_CATEGORIES_CHILD } from "common/apiEndpoints";
 
 
@@ -23,7 +23,7 @@ const SubCategoryChild=()=>{
 
     const Children = () =>{
         let newData = [];
-        console.log('DATA:',data)
+        
         if(error){
         return (
             <h5>No data to load !!</h5>

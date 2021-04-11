@@ -1,11 +1,11 @@
 import React from "react";
 import {Table, Button} from "antd";
-import Spinner from "../../spin/spiner"
+import Spinner from "../../../../spin/spiner"
 import useSWR from "swr"
 import axios from 'axios'
 import moment from 'moment'
-import DynamicCategory from 'components/modals/Category'
-import {subCategoryColumns } from '../tables/categoryColumns'
+import DynamicCategory from 'components/admin/category/components/categoryType'
+import {subCategoryColumns } from './columns/categoryColumns'
 import { SUB_CATEGORIES } from "common/apiEndpoints";
 
 
@@ -30,7 +30,7 @@ const SubCategory=()=>{
         )
         }
         if (!data) return <Spinner />
-        else newData = data.data.map(elm=>(console.log('ELM:',elm),{
+        else newData = data.data.map(elm=>({
         ...elm,
         key:elm._id,
         name:elm.name,

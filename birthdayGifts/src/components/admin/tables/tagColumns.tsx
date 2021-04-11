@@ -1,5 +1,5 @@
 import {Tag, Space} from "antd";
-import EditTag from "components/modals/Tag";
+import EditTag from "components/admin/tag/components/tagType";
 import DeleteTag, { deleteProps } from 'components/modals/removeItem'
 import { TAGS } from "common/apiEndpoints";
 export const tagColumns = [

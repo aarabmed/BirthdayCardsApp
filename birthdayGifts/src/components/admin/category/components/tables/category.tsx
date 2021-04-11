@@ -5,9 +5,9 @@ import useSWR,{mutate} from "swr"
 import axios from 'axios'
 import moment from 'moment'
 
-import DynamicCategory from 'components/modals/Category'
-import {categoryColumns} from '../tables/categoryColumns'
-import Spinner from '../../spin/spiner'
+import DynamicCategory from '../categoryType'
+import {categoryColumns} from './columns/categoryColumns'
+import Spinner from 'components/spin/spiner'
 import { CATEGORIES } from 'common/apiEndpoints'
 
 
@@ -33,7 +33,6 @@ const Category=()=>{
                 <h5>No data to load !!</h5>
             )
         }
-        console.log('TAGS::::',data);
 
         if (!data) return <Spinner />
         else newData = data.data.map(elm=>{
@@ -45,7 +44,7 @@ const Category=()=>{
             elm.subCategory.map(sub=>sub.childrenSubCategory.map(e=>e.tags.map(i=>tagsChildren.push(i))))
             elm.subCategory.map(sub=>sub.childrenSubCategory.map(e=>subChildren.push({_id:e._id,name:e.name})))
 
-            console.log('ALL-subChildren:',subChildren)
+
            return ({
             ...elm,
             key:elm._id,

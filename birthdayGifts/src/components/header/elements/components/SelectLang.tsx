@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import Icon,{ LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import Icon from '@ant-design/icons';
 import Icons from 'assets/icons'
-import { Avatar, Menu, Spin } from 'antd';
+import { Menu } from 'antd';
 
 
 const { SubMenu } = Menu;

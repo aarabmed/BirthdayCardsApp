@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import FormData from 'form-data';
 import axios from 'axios';
 import useSWR,{mutate} from "swr"
-import ImageUpload from './components/uploadImage'
+import ImageUpload from '../../../modals/components/uploadImage'
 import redirectToLogin from 'common/redirectToLogin'
 import checkAuth from 'common/auth'
 

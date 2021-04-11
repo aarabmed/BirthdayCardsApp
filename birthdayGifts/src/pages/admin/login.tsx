@@ -76,8 +76,7 @@ const Login: React.FC<LoginProps> = (props) => {
   useEffect(()=>{
     (async function auth(){
       const isAuth = await checkAuth() 
-      const oldRoute = router.query.redirectTo?router.query.redirectTo:'dashboard'
-      if(isAuth) router.push(`${oldRoute}`)
+      if(isAuth) router.push(`${route}`)
       if(!isAuth) setLoading(false)
       doesConnectionExist().then(res=>{
       })

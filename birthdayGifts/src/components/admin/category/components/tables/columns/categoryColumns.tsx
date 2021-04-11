@@ -1,5 +1,5 @@
-import ModalView from 'components/modals/viewCategory'
-import EditCategory from 'components/modals/Category'
+import ModalView from 'components/admin/category/components/viewCategory'
+import EditCategory from 'components/admin/category/components/categoryType'
 import DeleteComponent, { deleteProps } from 'components/modals/removeItem'
 import {CATEGORIES,SUB_CATEGORIES_CHILD,SUB_CATEGORIES} from 'common/apiEndpoints'
 import {Tag, Space} from "antd";

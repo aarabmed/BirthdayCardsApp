@@ -10,6 +10,7 @@ router.get("/", getAllCards);
 
 router.get("/:id", getCard);
 
+
 router.post("/new",checkAuth,uploadImage('cardImage'), createCard);
 
 router.patch("/:id",checkAuth,uploadImage('cardImage'), updateCard);

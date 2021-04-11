@@ -8,7 +8,7 @@ const initialState = {
   },
   category: "",
   keyword: "",
-  route:"",
+  route:"dashboard",
 };
 
 const globalReducer = (state = initialState, action) => {

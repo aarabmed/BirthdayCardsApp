@@ -103,7 +103,6 @@ const ModalView = (props) => {
   const {record,name} = props
   return (
     <>
-    {console.log('SUB_DATA:',data)}
       <a onClick={showModal}>{name}</a>
       <Modal visible={isModalVisible} onCancel={handleCancel} footer={null} width={820}>
         <div className='category-modal-container'>

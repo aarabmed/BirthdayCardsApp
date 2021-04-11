@@ -1,12 +1,12 @@
 import React from "react";
 import { Table, Button} from "antd";
-import Spinner from "../spin/spiner"
+import Spinner from "../../spin/spiner"
 import useSWR from "swr"
 import axios from 'axios'
 import moment from 'moment'
 
-import {tagColumns } from './tables/tagColumns'
-import AddTag from "../modals/Tag";
+import {tagColumns } from '../tables/tagColumns'
+import AddTag from "./components/tagType";
 import { TAGS } from "common/apiEndpoints";
 
 

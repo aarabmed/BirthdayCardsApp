@@ -10,14 +10,18 @@ type props = {
   pageType:string
 }
 
-const User = dynamic(
-  import('./user')
+const Users = dynamic(
+  import('./user/userIndex')
 )
-const Tag = dynamic(
-  import('./tag')
+const Tags = dynamic(
+  import('./tag/tagIndex')
 )
 const Categories = dynamic(
-  import('./category')
+  import('./category/categoryIndex')
+)
+
+const Cards = dynamic(
+  import('./cards')
 )
 
 
@@ -28,20 +32,17 @@ const AdminLayout:React.FC<props> =({
   const RenderPage:React.FC<{type:string}>= ({type})=>{
     switch (type) {
       case 'users':
-        return(
-          <User />
-        )
+        return <Users />
   
       case 'cards':
-        return <>{console.log('Card Page')}</>
+        return <Cards/>
+
       case 'categories':
-        return(
-          <Categories/>
-        )
+        return <Categories/>
+
       case 'tags':
-        return(
-          <Tag/>
-        )
+        return <Tags/>
+        
       default:
         return(
           <>{console.log('dashboard')}</>

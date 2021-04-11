@@ -1,6 +1,6 @@
 import React, {useState,useRef} from "react";
 import Head from "next/head";
-import { BackTop, message ,Row,Col} from "antd";
+import { BackTop ,Row,Col} from "antd";
 
 import Header from "../header/Header";
 
@@ -8,7 +8,7 @@ import Container from "../other/Container";
 import LeftSideMenu from "../admin/sideMenu";
 
 
-  
+   
 function LayoutOne({
   title,
   children,
@@ -41,10 +41,7 @@ function LayoutOne({
     reportWindowSize()
   },[])
 
-  message.config({
-    maxCount: 3,
-    duration: 1,
-  });
+ 
   
   return (
     <>

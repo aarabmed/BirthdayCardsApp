@@ -6,9 +6,9 @@ import { Modal, Button,Form,
     Input,
     Select,
 } from "antd";
-import AvatarInput from './components/avatarInput';
+import AvatarInput from '../../../modals/components/avatarInput';
 import axios from 'axios'
-import {withAuth} from '../../context/helper'
+import {withAuth} from '../../../../context/helper'
 import { SIGNUP } from 'common/apiEndpoints';
 
 

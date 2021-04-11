@@ -3,15 +3,15 @@ import dynamic from "next/dynamic";
 import { Space, Divider} from "antd";
 
 const Category = dynamic(
-    import('./components/category')
+    import('./components/tables/category')
 );
 
 const SubCategory = dynamic(
-  import('./components/sub-category')
+  import('./components/tables/sub-category')
 )
 
 const SubCategoryChild = dynamic(
-  import('./components/sub-category-child')
+  import('./components/tables/sub-category-child')
 )
 
 
