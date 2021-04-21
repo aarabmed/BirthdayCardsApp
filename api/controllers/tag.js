@@ -31,6 +31,34 @@ exports.getAllTags = async (req, res, next) => {
 }
 
 
+
+//! ----- CREATE A MULTIPLE TAGS ----------
+
+exports.createMutipleTags = async (req, res, next) => {
+    const names =req.body.tags 
+    const currentUserId = req.body.currentUserId
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    const newTags= names.map(name=>({name:name.split(' ').map(capitalize).join(' '),slug:name.split(' ').join('-').toLowerCase(),status:true,createdBy:currentUserId}));
+        
+   
+    const savedTag  = await Tag.insertMany(newTags);
+    if(!savedTag){
+        return res.status(500).json({
+            data:null,
+            message:'Server failed to save the new tag'
+        })
+    }
+    return res.status(201).json({
+        res:savedTag,
+        message:`${names.length>1?'Tags have':'a tag has'} been saved successfully'`
+    })
+}
+
+
 //! ----- CREATE A NEW TAG ----------
 exports.createTag = async (req, res, next) => {
     const name = req.body.name
@@ -54,9 +82,9 @@ exports.createTag = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newName= name.split(' ').map(capitalize).join(' ');
+    const newName= name.trim().split(' ').map(capitalize).join(' ');
 
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
         
     const tag = await new Tag({
         name:newName,
@@ -105,8 +133,8 @@ exports.updateTag = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newName= name.split(' ').map(capitalize).join(' ');
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newName= name.trim().split(' ').map(capitalize).join(' ');
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
     const tag = await Tag.findOne({_id:tagId})
 
@@ -122,7 +150,7 @@ exports.updateTag = async (req, res, next) => {
             message:'Server failed to update the current tag'
         })
     }
-    return res.status(201).json({
+    return res.status(200).json({
         data:updatedTag,
         message:'Tag updated successfully'
     })
@@ -193,7 +221,7 @@ exports.deleteTag = async (req, res, next) => {
             })
         }
 
-        return res.status(201).json({
+        return res.status(200).json({
             data:tag,
             message:`Tag ${tag.name} has been deleted successfully`
         })

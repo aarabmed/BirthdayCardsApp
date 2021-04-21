@@ -3,7 +3,7 @@ import jwtDecode from "jwt-decode";
 import nookies from 'nookies'
 import moment from 'moment'
 
-const checkAuth  = async (ctx)=>{
+const checkAuth  = (ctx)=>{
     let token = nookies.get(ctx).token;
     let decodedToken = null;
     let isAuth = null

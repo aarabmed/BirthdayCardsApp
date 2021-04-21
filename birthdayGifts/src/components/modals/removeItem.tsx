@@ -1,4 +1,4 @@
-import React ,{useState} from 'react'
+import React ,{useEffect, useState} from 'react'
 import Icon from '@ant-design/icons';
 import { useSelector } from "react-redux";
 import { Modal, Button, Space } from 'antd';
@@ -6,23 +6,23 @@ import axios from 'axios'
 import Icons from 'assets/icons'
 import { parseCookies } from 'nookies';
 import { mutate } from 'swr';
-import checkAuth from 'common/auth'
-import redirectToLogin from 'common/redirectToLogin'
+import isAuth from 'common/isAuthenticated'
 
-type DeleteButton = 'link'|'regular'
 export type deleteProps ={
   itemId:string,
   itemName:string,
   targetUrl:string,
   type:string,
-  button:DeleteButton,
+  button?:"link" | "regular",
   onDelete?:()=>void,
+  doRefrech?:()=>void,
+  customButton?:JSX.Element
 }
 
 const SuccussIcon  = ()=> <Icon component={Icons.successIcon} />
 const FailIcon  = ()=> <Icon component={Icons.failIcon} />
 
-const deleteFunction=({itemId,type,targetUrl,itemName,button,onDelete}:deleteProps)=>{
+const deleteFunction=({itemId,type,targetUrl,itemName,button,onDelete,doRefrech,customButton}:deleteProps)=>{
      const {currentUser} = useSelector((state) => state.userReducer);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -31,18 +31,23 @@ const deleteFunction=({itemId,type,targetUrl,itemName,button,onDelete}:deletePro
 
     const handleCancel =()=>{
         setVisible(false)
-        if(isDeleted){
+        if(isDeleted && typeof(onDelete) === 'function'){
           onDelete()
+        }
+        if(isDeleted && typeof(doRefrech) !== 'function'){
+          mutate(targetUrl)
         }
     }
 
-    const showModal = async ()=>{
-        const isAuth = await checkAuth()
-        if(isAuth){
-          setVisible(true)
-          return
-        }
-        redirectToLogin()
+    
+    useEffect(()=>{
+      if(isDeleted && typeof(doRefrech) === 'function'){
+        doRefrech()
+      }
+    },[isDeleted])
+
+    const showModal = ()=>{
+      isAuth(()=>setVisible(true))
     }
 
     const axiosHeader = ()=>{
@@ -53,47 +58,59 @@ const deleteFunction=({itemId,type,targetUrl,itemName,button,onDelete}:deletePro
       return config
     }
 
+
+
     const confirmDelete =()=>{
-      setConfirmLoading(true)
-      const {userId} = currentUser
-      const axiosInstance = axios.create({
-        validateStatus: function (status)
-        {
-            return true
-        }
-      });
-         axiosInstance.patch(
-          `${targetUrl}/delete/${itemId}`,
-          {currentUserId:userId},
-          axiosHeader(),
-        ).then(res=>{
-          console.log('Cat-res:',res)
-            if (res.status===200) { 
+      isAuth(()=>{
+          setConfirmLoading(true)
+          const {userId} = currentUser
+          const axiosInstance = axios.create({
+            validateStatus: function (status)
+            {
+                return true
+            }
+          });
+          axiosInstance.patch(
+            `${targetUrl}/delete/${itemId}`,
+            {currentUserId:userId},
+            axiosHeader(),
+          ).then(res=>{
+            console.log('Cat-res:',res)
+              if (res.status===200) { 
                 mutate(targetUrl)
                 setTimeout(() => {
+                    setConfirmLoading(false);
+                    setIsDeleted(true)
+                    setMessage(res.data.message)
+                  }, 1000);
+              }else{
                   setConfirmLoading(false);
+                  setIsDeleted(false)
                   setMessage(res.data.message)
-                  setIsDeleted(true)
-                }, 1000);
-            }else{
-                setConfirmLoading(false);
-                setIsDeleted(false)
-                setMessage(res.data.message)
-            }
-        }).catch(e=>{
-            console.log('Error:',e)
-        })
+              }
+          }).catch(e=>{
+              console.log('Error:',e)
+          })
+      })
     }
 
     const withProps = isDeleted ? {
       footer:null
     }:{}
 
+    const CButton = () =>{
+      if(customButton){
+        return <div onClick={showModal}>{customButton}</div>
+      }
+      if(button==='link') return <a onClick={showModal}> delete </a>
+      else return <Button key="1111" type='primary' danger onClick={showModal}>Delete</Button>
+    }
+
     return(
     <>
-      {button==='link'?<a onClick={showModal}> delete </a>:<Button key="1111" type='primary' danger onClick={showModal}>Delete</Button>}
+      <CButton/>
       <Modal
-          destroyOnClose={true}
+          //destroyOnClose={true}
           title={false}
           visible={visible}
           centered={true}
@@ -104,7 +121,7 @@ const deleteFunction=({itemId,type,targetUrl,itemName,button,onDelete}:deletePro
           width={400}
           okText = {message?'Try again':'Confirm'}
           {...withProps}
-          
+          forceRender={true}
         >
           {!message?
           <div className="warning-modal-container">

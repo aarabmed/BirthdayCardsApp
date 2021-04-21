@@ -1,5 +1,6 @@
 import { Modal, Button } from 'antd';
 import Router from 'next/router';
+import checkAuth from './auth'
 
 
 
@@ -24,4 +25,12 @@ function countDown() {
 
 }
 
-export default countDown
+
+const checkIfAuthenticated = (callback) =>{
+  //let isAuthenticated
+  const res = checkAuth()
+  if(!res)return countDown()
+  return callback()
+}
+
+export default checkIfAuthenticated

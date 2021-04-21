@@ -11,10 +11,11 @@ const persistConfig = {
   key: "root",
   storage: storage,
   stateReconciler: autoMergeLevel2,
-  whitelist: ["globalReducer", "userReducer"],
+  whitelist: ["globalReducer", "userReducer","cardReducer"],
 };
 
 const pReducer = persistReducer(persistConfig, rootReducer);
+
 const createdStore = createStore(
   pReducer,
   composeWithDevTools(applyMiddleware(thunk))

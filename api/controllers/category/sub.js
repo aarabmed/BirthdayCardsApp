@@ -11,9 +11,23 @@ const {nameProperties,statusProperties,descriptionProperties,imageProperties,slu
  
 
 //! ----- RETRIEVE A SINGLE CATEGORY ----------
-/* exports.getCategory = async (req, res, next) => {
-
-} */
+exports.getSubCategory = async (req, res, next) => {
+    const id = req.params.id
+    const categories = await SubCategory.findById({_id:id},{deleted:false})
+    .populate([
+        {path:"childrenSubCategory",select:"name ",model:'ChildrenSubCategory',match:{deleted:false},}
+    ]);
+    if(!categories){
+        return res.status(404).json({
+            data:[],
+            message:'No category existed yet'
+        })
+    }
+    return res.status(200).json({
+        res:categories,
+        message:'Opperation successed'
+    })
+}
 
 //! ----- RETRIEVE ALL CATEGORIES ----------
 exports.getAllSubCategories = async (req, res, next) => {
@@ -73,8 +87,8 @@ exports.createSubCategory = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newName= name.split(' ').map(capitalize).join(' ');
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newName= name.trim().split(' ').map(capitalize).join(' ');
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
     const subCategory = await new SubCategory({
         name:newName,
@@ -171,9 +185,9 @@ exports.updateSubCategory = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newName= name.split(' ').map(capitalize).join(' ');
+    const newName= name.trim().split(' ').map(capitalize).join(' ');
 
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
     subCategory.name = newName;
     subCategory.description = description;
@@ -202,7 +216,7 @@ exports.updateSubCategory = async (req, res, next) => {
             message:'Error while editing the sub category'
         })
     }
-    return res.status(201).json({
+    return res.status(200).json({
         data:updatedSubCategory,
         message:'Sub Category updated successfully'
     })
@@ -238,7 +252,7 @@ exports.deleteSubCategory = async (req, res, next) => {
             })
         }
 
-        return res.status(201).json({
+        return res.status(200).json({
             data:deletedSubCategory,
             message:`Sub-Category ${subCategory.name} has been disabled successfully`
         })

@@ -14,12 +14,32 @@ width: 100%;
     }
 }
 
+.cardFormInputs {
+    width: 65%;
+    .ant-row{
+        justify-content: end;
+    }
+}
+
+.ant-upload.ant-upload-select-picture-card{
+    margin-bottom: unset !important;
+}
+
 .categoryImage{
-    width:35%;
+    width: 45%;
     cursor: pointer;
     transition: box-shadow 0.3s, border-color 0.3s;
     border: 1px solid #f0f0f0;
+    display: grid;
+    align-content: center;
+    height: min-content;
+    .ant-form-item{
+        margin-bottom: unset;
+        vertical-align: unset;
+    }
 }
+
+
 
 .categoryImage > .ant-row > .ant-col {
     max-width: 100%;

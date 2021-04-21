@@ -7,7 +7,7 @@ const  {getCategory,getAllCategories,createCategory, updateCategory,deleteCatego
 
 router.get("/", getAllCategories);
 
-// router.get("/categories/:categoryId", getCategory);
+router.get("/:id", getCategory);
 
 router.post("/new",uploadImage('categoryImage'),checkAuth, createCategory);
 

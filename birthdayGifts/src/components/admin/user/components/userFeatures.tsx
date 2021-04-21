@@ -10,6 +10,7 @@ import { parseCookies } from "nookies";
 import { USERS } from "common/apiEndpoints";
 import Icons from 'assets/icons'
 import DeleteComponent from 'components/modals/removeItem'
+import isAuth from 'common/isAuthenticated'
 
 const axiosHeader = ()=>{
   const {token} = parseCookies()
@@ -20,6 +21,12 @@ const axiosHeader = ()=>{
 }
 
 
+const axiosInstance = axios.create({
+  validateStatus: function (status)
+  {
+      return true
+  }
+});
 
 
 const userFeatures = ({userInfo,refreachData,goBack}) =>{
@@ -48,14 +55,7 @@ const userFeatures = ({userInfo,refreachData,goBack}) =>{
       }
 
       const onSubmitFeature=(target,id,data)=>{
-        const axiosInstance = axios.create({
-          validateStatus: function (status)
-          {
-              return true
-          }
-        });
-
-        
+  
            axiosInstance.patch(
             `${USERS}/${target}/${id}`,
             data,
@@ -82,28 +82,31 @@ const userFeatures = ({userInfo,refreachData,goBack}) =>{
       
 
       const onFeaturesOk = () => {
-        setConfirmLoading(true);
-        if(featureType==='Upgrading'){
-          const data = {
-            role:newUserFeature,
-            currentUserId:currentUser.userId,
+        isAuth(()=>{
+          setConfirmLoading(true);
+          if(featureType==='Upgrading'){
+            const data = {
+              role:newUserFeature,
+              currentUserId:currentUser.userId,
+            }
+            onSubmitFeature('upgrade',userInfo.key??userInfo._id,data)
           }
-          onSubmitFeature('upgrade',userInfo.key??userInfo._id,data)
-        }
-        if(featureType==='Downgrading'){
-          const data = {
-            role:newUserFeature,
-            currentUserId:currentUser.userId,
+          if(featureType==='Downgrading'){
+            const data = {
+              role:newUserFeature,
+              currentUserId:currentUser.userId,
+            }
+            onSubmitFeature('downgrade',userInfo.key??userInfo._id,data)
           }
-          onSubmitFeature('downgrade',userInfo.key??userInfo._id,data)
-        }
-        if(featureType==='Status'){
-          const data = {
-            status:newUserFeature,
-            currentUserId:currentUser.userId,
+          if(featureType==='Status'){
+            const data = {
+              status:newUserFeature,
+              currentUserId:currentUser.userId,
+            }
+            onSubmitFeature('status',userInfo.key??userInfo._id,data)
           }
-          onSubmitFeature('status',userInfo.key??userInfo._id,data)
-        }
+        })
+        
       };
         
     

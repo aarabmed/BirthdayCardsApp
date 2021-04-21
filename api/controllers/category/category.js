@@ -8,9 +8,23 @@ const isBoolean = require('../../utils/toBoolean');
 const {nameProperties,statusProperties,descriptionProperties,imageProperties,slugProperties} = require('../inputs/category')
 
 //! ----- RETRIEVE A SINGLE CATEGORY ----------
-/* exports.getCategory = async (req, res, next) => {
-childrenSubCategory
-} */
+exports.getCategory = async (req, res, next) => {
+    const id = req.params.id
+    const categories = await Category.findById({_id:id},{deleted:false})
+    .populate([
+        {path:"subCategory",select:"name ",model:'SubCategory',match:{deleted:false},}
+    ]);
+    if(!categories){
+        return res.status(404).json({
+            data:[],
+            message:'No category existed yet'
+        })
+    }
+    return res.status(200).json({
+        res:categories,
+        message:'Opperation successed'
+    })
+}
 
 //! ----- RETRIEVE ALL CATEGORIES ----------
 exports.getAllCategories = async (req, res, next) => {
@@ -81,8 +95,8 @@ exports.createCategory = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newName= name.split(' ').map(capitalize).join(' ');
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newName= name.trim().split(' ').map(capitalize).join(' ');
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
     const category = await new Category({
         name:newName,
@@ -161,8 +175,8 @@ exports.updateCategory = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newName= name.split(' ').map(capitalize).join(' ');
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newName= name.trim().split(' ').map(capitalize).join(' ');
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
     category.name = newName;
     category.description = description;
@@ -185,7 +199,7 @@ exports.updateCategory = async (req, res, next) => {
     /* removedSubCategory.length && await SubCategory.updateMany({_id:removedSubCategory},{$pull:{"category":updatedCategory._id}})
     newSubCategory.length && await SubCategory.updateMany({_id:newSubCategory},{$push:{"category":updatedCategory._id}})
  */
-    return res.status(201).json({
+    return res.status(200).json({
         data:updatedCategory,
         message:'Category updated successfully'
     })

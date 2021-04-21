@@ -3,17 +3,17 @@ import { Alert, Checkbox } from 'antd';
 import React, { useState,useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import fetch from "node-fetch";
-import checkAuth from '../../common/auth'
+import checkAuth from 'common/auth'
 import { setCookie } from 'nookies'
 import Router,{ useRouter } from "next/router";
-import Spinner from "../../components/spin/spiner"
+import Spinner from "components/spin/spiner"
 
-import {doesConnectionExist} from '../../common/check-internet'
-import {setRoute} from "../../redux/actions/globalActions";
-import {setUser} from "../../redux/actions/userActions";
+import {doesConnectionExist} from 'common/check-internet'
+import {setRoute} from "redux/actions/globalActions";
+import {setUser} from "redux/actions/userActions";
 
 
-import LoginFrom from '../../components/login';
+import LoginFrom from 'components/login';
 import { LOGIN } from 'common/apiEndpoints';
 
 
@@ -43,7 +43,7 @@ interface Response {
   data?:User;
   status?:number;
   message?:string;
-} 
+}
 
 interface LoginProps {
   error?: string;
@@ -74,8 +74,8 @@ const Login: React.FC<LoginProps> = (props) => {
 
  // const [type, setType] = useState<string>('account');
   useEffect(()=>{
-    (async function auth(){
-      const isAuth = await checkAuth() 
+    (function auth(){
+      const isAuth = checkAuth() 
       if(isAuth) router.push(`${route}`)
       if(!isAuth) setLoading(false)
       doesConnectionExist().then(res=>{
@@ -106,40 +106,37 @@ const Login: React.FC<LoginProps> = (props) => {
       dispatch(setRoute("dashboard"))
     }
 
-    const {status,message,data}:Response = await fetch(
+    const res:Response = await fetch(
       LOGIN,{
         method: 'POST',
         body: JSON.stringify(values),
         headers: { 'Content-Type': 'application/json' }
-      }
-      ).then(res=>res.json()).catch(e=>{
+      }).then(res=>res.json()).catch(e=>{
           setSubmitting(false);
           setErrorMessage('Error while connecting to Database, try later')
-      })
+    })
       
-      if(status===200){
+    if(res?.status===200){
         const user = {
-          userId:data.userId,
-          userName:data.userName,
-          authority:data.authority,
-          avatar:data.avatar
+          userId:res.data.userId,
+          userName:res.data.userName,
+          authority:res.data.authority,
+          avatar:res.data.avatar
         }
+
         dispatch(setUser(user))
-        setCookie(null, 'token', data.token, {
+        setCookie(null, 'token', res.data.token, {
           maxAge: 30 * 24 * 60 * 60,
           path: '/',
           secure: false,
         })
-
-        
         
         Router.push(newRoute)
-      }else{
+    }else{
         setSubmitting(false);
-        setErrorMessage(message);
-      }
-    
-  };
+        //setErrorMessage(rmessage);
+    }
+  } 
   if(loading) return <div className='indexSpinner'><Spinner/></div>
   return (
     <div className='login-container'>
@@ -185,7 +182,6 @@ const Login: React.FC<LoginProps> = (props) => {
 
 export const getServerSideProps = async (ctx) => {
   
-  const isAuth =  await checkAuth(ctx)  
   return {
     props: {},
   };

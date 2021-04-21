@@ -32,11 +32,10 @@ const SubCategoryChild=()=>{
         if (!data) return <Spinner />
         else newData = data.data.map(elm=>({
             ...elm,
-            tags:elm.tags.map(e=>({name:e.name,_id:e._id})),
             key:elm._id,
             name:elm.name,
             slug:elm.slug,
-            image:elm.image.path,
+            image:elm.image,
             createdAt:moment(elm.createdAt).format('DD MMM YYYY'),
             updatedAt:moment(elm.updatedAt).format('DD MMM YYYY'),
             status:elm.status,

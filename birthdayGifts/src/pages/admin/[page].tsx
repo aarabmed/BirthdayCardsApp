@@ -3,10 +3,12 @@ import React, {useState,useContext,useEffect} from "react"
 import { useRouter } from "next/router";
 
 import dynamic from 'next/dynamic';
-import LayoutOne from "../../components/layouts/LayoutOne";
+import LayoutOne from "components/layouts/LayoutOne";
 
-import Spinner from "../../components/spin/spiner"
-import checkAuth from '../../common/auth' 
+import Spinner from "components/spin/spiner"
+import checkAuth from 'common/auth' 
+import { parseCookies } from "nookies";
+import axios from "axios";
 
 
 
@@ -14,6 +16,14 @@ const AdminLayout = dynamic(
   import('../../components/admin/adminLayout')
 );
 
+const axiosHeader = (value)=>{
+  const {token} = parseCookies()
+  const config = {
+    headers: { Authorization: `Bearer ${token}` }, 
+    params:value
+  };
+  return config
+}
 
 
 
@@ -49,7 +59,7 @@ const Index = ()=> {
 
 export const getServerSideProps = async (ctx) => {
 
-  const isAuth =  await checkAuth(ctx)  
+  const isAuth = checkAuth(ctx)  
   if(!isAuth){
     return {
         redirect: {
@@ -58,6 +68,7 @@ export const getServerSideProps = async (ctx) => {
         },
     }
   }
+
   return {
     props: {},
   };

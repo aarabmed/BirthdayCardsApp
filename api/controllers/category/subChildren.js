@@ -69,8 +69,8 @@ exports.createSubCategoryChild = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newName= name.split(' ').map(capitalize).join(' ');
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newName= name.trim().split(' ').map(capitalize).join(' ');
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
     
     const subCategoryChild = await new SubCategoryChild({
@@ -157,8 +157,8 @@ exports.updateSubCategoryChild = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newName= name.split(' ').map(capitalize).join(' ');
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newName= name.trim().split(' ').map(capitalize).join(' ');
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
 
    
@@ -182,7 +182,7 @@ exports.updateSubCategoryChild = async (req, res, next) => {
             message:'Error while editing the sub category child'
         })
     }
-    return res.status(201).json({
+    return res.status(200).json({
         data:updatedSubCategoryChild,
         message:'Sub category child updated successfully'
     })
@@ -218,7 +218,7 @@ exports.deleteSubCategoryChild = async (req, res, next) => {
             })
         }
 
-        return res.status(201).json({
+        return res.status(200).json({
             data:deletedSubCategoryChild,
             message:`Sub-Category child ${deletedSubCategoryChild.name} has been deleted successfully`
         })

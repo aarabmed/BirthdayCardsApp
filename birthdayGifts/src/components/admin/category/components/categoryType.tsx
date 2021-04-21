@@ -4,8 +4,7 @@ import FormData from 'form-data';
 import axios from 'axios';
 import useSWR,{mutate} from "swr"
 import ImageUpload from '../../../modals/components/uploadImage'
-import redirectToLogin from 'common/redirectToLogin'
-import checkAuth from 'common/auth'
+import isAuth from 'common/isAuthenticated'
 
 import { Modal, Button,Form,
   Input,
@@ -23,13 +22,16 @@ import { CATEGORIES, SUB_CATEGORIES, SUB_CATEGORIES_CHILD, TAGS } from 'common/a
     name:string
   }
 
+  type Img = {
+    path:string
+  }
   type categoryType ={
     key?:string,
     name:string,
     description:string,
     slug:string,
     status:boolean,
-    image:File|string,
+    image:File & Img,
     tags?:[Obj],
     subCategory?:[Obj],
     childrenSubCategory?:[Obj]
@@ -38,7 +40,7 @@ import { CATEGORIES, SUB_CATEGORIES, SUB_CATEGORIES_CHILD, TAGS } from 'common/a
   type Props ={
     item?:categoryType,
     type:string,
-    mode?:'add'|'edit',
+    mode:'add'|'edit',
     runMutate?:()=>Promise<any>
   } 
 
@@ -88,16 +90,11 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
         headers: { Authorization: `Bearer ${token}` }
     };
     return config
-  }
+  } 
 
   
-  const showModal = async () => {
-      const isAuth = await checkAuth()
-      if(isAuth){
-        setIsModalVisible(true);
-        return
-      }
-      redirectToLogin()
+  const showModal = () => {
+      isAuth(()=>setIsModalVisible(true))
   };
 
   
@@ -119,22 +116,17 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
 
 
 
-  const handleOk = async () => {
-    const isAuth = await checkAuth()
-    form
+  const handleOk =  () => {
+    isAuth(()=>{
+      form
       .validateFields()
       .then((values) => {
-        
-        if(isAuth){
-          mode==='add'?onCreate(values):onUpdate(values);
-          return
-        }
-        
-        redirectToLogin()
+        mode==='add'?onCreate(values):onUpdate(values);
       })
       .catch((info) => {
         console.log('Form errors', info);
-      });
+      })
+    })
   };
 
 
@@ -142,6 +134,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
   const handleCancel = () => {
     setIsModalVisible(false);
     setConfirmLoading(false);
+    setimgUrl('')
     form.resetFields();
   };
 
@@ -157,7 +150,6 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
       if(type==='category'){
         formData.append('categoryImage',values.image);
         const newSubCategory = values.subCategory?JSON.stringify(values.subCategory):undefined
-        console.log('newSubCategory:::', typeof newSubCategory)
         formData.append('subCategory',newSubCategory);
       }
 
@@ -189,6 +181,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                 setTimeout(() => {
                   setIsModalVisible(false);
                   setConfirmLoading(false);
+                  setimgUrl('')
                   form.resetFields();
                 }, 1000);
                 refreshData();
@@ -237,18 +230,20 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
         formData,
         axiosHeader(),
       ).then(res=>{
-        console.log('Cat-res:',res)
+
           if (res.status===201) {
               
               setTimeout(() => {
                 setIsModalVisible(false);
                 mutate(url)
                 setConfirmLoading(false);
+                setimgUrl('')
                 form.resetFields();
               }, 1000);
           }else{
               setConfirmLoading(false);
           }
+
       }).catch(e=>{
           console.log('Error:',e)
       })
@@ -270,23 +265,21 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
         <div>form does not exist</div>;
     }
   }
-
-  
-
  
 
 
   const CategoryForm:React.FC= ()=>{
-    const [loading, setLoading] = useState(true)
+    //const [loading, setLoading] = useState(true)
     let SubCategoiresOptions = []
     const response = useSWR(SUB_CATEGORIES, fetcher)
 
     SubCategoiresOptions = response.data.data.map(e=>({label:e.name,value:e._id}))
     let subCategoryInitial = mode === 'edit'? SubCategoiresOptions.filter(e=>item.subCategory.some(sub=>sub._id===e.value)).map(e=>e.value) : [];
-    if(loading){
+    /* if(loading){
       setLoading(false)
-    }
+    } */
     useEffect(()=>{
+
       if(item){
         const {name,slug,description,status,image} = item;
         if(refForm.current && !confirmLoading){
@@ -312,7 +305,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                 <Form.Item 
                   name="image" 
                   >
-                  <ImageUpload uploadedImage={getImage} storedImage={savedImage} mode={mode} image={{newImg:imgUrl,oldImg:item?item.image:''}} />
+                  <ImageUpload uploadedImage={getImage}  oldImage={item?item.image.path:''} />
       
                 </Form.Item>
             </div>
@@ -340,7 +333,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
               <Form.Item
                   name="description"
                   label={'Description'}
-                  rules={[{ required: true, message: 'the name is required'}]}
+                  rules={[{ required: true, message: 'the description is required'}]}
               >
                   <Input/>
               </Form.Item>
@@ -362,7 +355,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                   label="Sub-category" 
                   rules={[{type:'array'}]}
                   >
-                  <Select mode="multiple" options={SubCategoiresOptions} loading={loading} />
+                  <Select mode="multiple" options={SubCategoiresOptions}  />
               </Form.Item>
           </div>
     </Form>
@@ -409,7 +402,6 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
       const {name,slug,description,status,image} = item;
       if(refForm.current&&!loadingTag&&!loadingSubCat&&!confirmLoading){
         form.setFieldsValue({status,slug,name,image,description,childrenSubCategory:subChildrenInitialValues,tags:tagsInitialValues})
-        console.log('EFFECT RUNED')
       }
      }
     },[refForm.current])
@@ -430,7 +422,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                           name="image" 
                           >
                     
-                          <ImageUpload uploadedImage={getImage} storedImage={savedImage} mode={mode} image={{newImg:imgUrl,oldImg:item?item.image:''}} />
+                          <ImageUpload uploadedImage={getImage} mode={mode} oldImage={item?item.image.path:''} />
                         </Form.Item>
                     </div>
                     <div className='categoryFormInputs'>
@@ -457,7 +449,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                       <Form.Item
                           name="description"
                           label={'Description'}
-                          rules={[{ required: true, message: 'the name is required'}]}
+                          rules={[{ required: true, message: 'the description is required'}]}
                       >
                           <Input/>
                       </Form.Item>
@@ -504,7 +496,6 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
     let tagsOptions = [];
     let tagsInitialValues = [];
 
-    console.log('tagsInitialValues:',responseTag)
     if(responseTag.data) {
       tagsOptions = responseTag.data.data.map(e=>({label:e.name,value:e._id}))
       mode === 'edit'? tagsInitialValues = tagsOptions.filter(e=>item.tags.some(tag=>tag.name===e.label)).map(e=>e.value):[]
@@ -542,7 +533,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                           name="image" 
                           >
                     
-                          <ImageUpload uploadedImage={getImage} storedImage={savedImage} mode={mode} image={{newImg:imgUrl,oldImg:item?item.image:''}} />
+                          <ImageUpload uploadedImage={getImage} oldImage={item?item.image.path:''} />
               
                         </Form.Item>
                     </div>
@@ -569,7 +560,7 @@ const CategoryType:React.FC<Props> =({item,type,mode,runMutate}) => {
                       <Form.Item
                           name="description"
                           label={'Description'}
-                          rules={[{ required: true, message: 'the name is required'}]}
+                          rules={[{ required: true, message: 'the description is required'}]}
                       >
                           <Input/>
                       </Form.Item>

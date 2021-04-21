@@ -8,7 +8,7 @@ import { Modal, Button,Form,
 } from "antd";
 import AvatarInput from '../../../modals/components/avatarInput';
 import axios from 'axios'
-import {withAuth} from '../../../../context/helper'
+import isAuth from 'common/isAuthenticated'
 import { SIGNUP } from 'common/apiEndpoints';
 
 
@@ -24,7 +24,7 @@ import { SIGNUP } from 'common/apiEndpoints';
     const router = useRouter();
 
     const showModal = () => {
-        withAuth(setIsModalVisible(true))
+        setIsModalVisible(true)
     };
 
     const refreshData = () => {
@@ -73,7 +73,7 @@ import { SIGNUP } from 'common/apiEndpoints';
         form
           .validateFields()
           .then((values) => {
-             onCreate(values);
+             isAuth(()=>onCreate(values))
           })
           .catch((info) => {
             console.log('Form errors', info);
@@ -101,7 +101,7 @@ import { SIGNUP } from 'common/apiEndpoints';
       
   return (
     <>
-      <Button type="primary" onClick={showModal}>Add a user</Button>
+      <Button type="primary" onClick={()=>isAuth(showModal)}>Add a user</Button>
       <Modal confirmLoading={confirmLoading} visible={isModalVisible} onOk={onOk} onCancel={handleCancel} width={670} title={'Create new user'}>
         <div className='user-modal-container'>
           <div className='user-modal-content'>

@@ -28,12 +28,18 @@ exports.getCard = async (req, res, next) => {
 
 //! ----- RETRIEVE ALL CARDS ----------
 exports.getAllCards = async (req, res, next) => {
-    const page = req.query.pageNumber||1;
-    const size = req.query.size||10;
+    const page = Number(req.query.page)||1;
+    const size = Number(req.query.size)||10;
 
     const { limit,offset } = getPagination(page,size)
 
-    const results = await Card.paginate({deleted:false},{offset,limit,sort:{createdAt:-1},populate:['tags','category']})
+    const results = await Card.paginate({deleted:false},{offset,limit,sort:{createdAt:-1},populate:[
+        {path:"tags",select:"name",model:'Tag',match:{deleted:false}},
+        {path:"subCategory",select:"name",model:'SubCategory',match:{deleted:false}},
+        {path:"subCategoryChild",select:"name",model:'ChildrenSubCategory',match:{deleted:false}},
+        {path:"category",select:"name",model:'Category',match:{deleted:false}},
+        {path:"createdBy",select:"userName",model:'User',match:{deleted:false}}
+    ]})
 
     return res.status(200).json({
         data:results.docs,
@@ -52,16 +58,15 @@ exports.createCard = async (req, res, next) => {
     const slug = req.body.slug
     const description = req.body.description;
     const categoryId = req.body.category;
-    const tags = req.body.tags;
+    const tags = req.body.tags?JSON.parse(req.body.tags):[];
     const cardImage = req.file;
     const cardSize = req.body.cardSize;
-    const status = isBoolean(req.body.status);
+    //const status = isBoolean(req.body.status);
     const subCategoryId = req.body.subCategory;
     const subCategoryChildId = req.body.subCategoryChild
     let isError = [];
     
    
-    
     if(categoryId){
         const newCategory = await Category.findById(categoryId);
 
@@ -101,7 +106,6 @@ exports.createCard = async (req, res, next) => {
         await validate(cardImage,cardImageProps),
         await validate(cardSize,cardSizeProps),
         await validate(slug,slugProperties),
-        await validate(status,statusProps),
     ].filter(e=>e!==true);
 
 
@@ -116,8 +120,8 @@ exports.createCard = async (req, res, next) => {
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newTitle= title.split(' ').map(capitalize).join(' ');
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newTitle= title.trim().split(' ').map(capitalize).join(' ');
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
 
     const card = new Card({
@@ -128,12 +132,13 @@ exports.createCard = async (req, res, next) => {
         tags:tags,
         image:newImage,
         cardSize:cardSize,
-        status:status,
+        status:true,
         subCategory:subCategoryId,
         subCategoryChild:subCategoryChildId,
         deleted:false,
         createdBy:currentUserId
     })
+
 
     const savedCard = await card.save();
     if(savedCard){
@@ -157,8 +162,8 @@ exports.updateCard = async (req, res, next) => {
     const categoryId = req.body.category;
     const subCategoryId = req.body.subCategory;
     const subCategoryChildId = req.body.subCategoryChild;
-    const tags = req.body.tags??[];
-    const cardImage = req.file;
+    const tags = req.body.tags?JSON.parse(req.body.tags):[];
+    const cardImage = req.file??'';
     const cardSize = req.body.cardSize;
     const status = isBoolean(req.body.status);
     let isError = []
@@ -220,16 +225,12 @@ exports.updateCard = async (req, res, next) => {
         })
     }
 
-    const removedTags = card.tags.filter(t=>!tags.includes(t.toString()))
-
-    const newTags = tags.filter(t=>!card.tags.includes(ObjectID(t)))
-
 
     function capitalize(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    const newTitle= title.split(' ').map(capitalize).join(' ');
-    const newSlug= slug.split(' ').join('-').toLowerCase();
+    const newTitle= title.trim().split(' ').map(capitalize).join(' ');
+    const newSlug= slug.trim().split(' ').join('-').toLowerCase();
 
     card.title = newTitle;
     card.slug = newSlug;
@@ -245,12 +246,9 @@ exports.updateCard = async (req, res, next) => {
 
     const updatedCard = await card.save()
 
-    removedTags.length && await Tag.updateMany({_id:removedTags},{$pull:{"card":updatedCard._id}})
-    newTags.length && await Tag.updateMany({_id:newTags},{$push:{"card":updatedCard._id}})
-
 
     if(updatedCard){
-        return res.status(201).json({
+        return res.status(200).json({
             data:updatedCard,
             message:'Card updated successfully'
         })
@@ -274,7 +272,7 @@ exports.deleteCard = async (req, res, next) => {
                 message:'Error while deleting the card'
             })
         }
-        return res.status(200).res({
+        return res.status(200).json({
             data:card,
             message:'Card deleted successfully'
         })

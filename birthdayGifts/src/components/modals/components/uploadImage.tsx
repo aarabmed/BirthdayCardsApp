@@ -1,16 +1,14 @@
-import React from 'react'
+
+import React, { useEffect, useState } from 'react'
 import { Upload, message } from 'antd';
 import { EditOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 
 type Props ={
-    storedImage:(e:string)=>void,
-    uploadedImage?:(e:Object)=>void,
-    image?:{
-      newImg:string,
-      oldImg:string|File
-    },
-    mode:string
+    storedImage?:(e:string)=>void,
+    uploadedImage:(e:Object)=>void,
+    oldImage?:string,
+    mode?:string,
 };
 
 
@@ -32,52 +30,54 @@ function beforeUpload(file) {
   return isJpgOrPng && isLt1M;
 }
 
-class uploadImage extends React.Component<Props>{
-    constructor(props: Props) {
-        super(props)
-    }
-    state = {
-        loading: false,
-        imageUrl: this.props.image.newImg?this.props.image.newImg:`/${this.props.image.oldImg}`,
-        edit:false
-    };
+const UploadImage:React.FC<Props>=({uploadedImage,oldImage})=>{
+    const [edit, setEdit] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [imageUrl,setImageUrl] = useState('')
   
 
-    showEdit =()=>{
-        this.setState({edit:true})
+    useEffect(()=>{
+      if(oldImage&&!imageUrl){
+          setImageUrl('/'+oldImage)
+          console.log('oldImg',oldImage,'-newImg:')
+      }
+    },[imageUrl])
+
+    const showEdit =()=>{
+        setEdit(true)
     }
-    hideEdit =()=>{
-        this.setState({edit:false})
+    const hideEdit =()=>{
+        setEdit(false)
     }
-    handleChange = info => {
+    const handleChange = info => {
         if (info.file.status === 'uploading') {
-        this.setState({ loading: true });
+          setLoading(true)
         return;
         }
         if (info.file.status === 'done') {
 
           // Get this url from response in real world.
         getBase64(info.file.originFileObj, imageUrl =>{
-            this.props.uploadedImage(info.file.originFileObj)
-            this.props.storedImage(imageUrl)
-            this.setState({
-            imageUrl,
-            loading: false,
-            })}
-        );
-            
-        }
-    };
+            uploadedImage(info.file.originFileObj)
+            //storedImage(imageUrl)
+            setImageUrl(imageUrl);
+            setLoading(false)
+        });
 
-  render() {
-    const { loading, imageUrl,edit } = this.state;
-    const { mode } = this.props;
+            
+        
+      };
+    }
+
     const uploadButton = (
-      <div>
-        {loading ? <LoadingOutlined /> : <PlusOutlined />}
-        <div style={{ marginTop: 8 }}>Upload</div>
+      <div className="uploadButton">
+        <div className="upload">
+          {loading ? <LoadingOutlined /> : <PlusOutlined />}
+          <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
       </div>
     );
+
     return (
       <Upload
         name="Image uploader"
@@ -86,12 +86,11 @@ class uploadImage extends React.Component<Props>{
         showUploadList={false}
         action=""
         beforeUpload={beforeUpload}
-        onChange={this.handleChange}
+        onChange={handleChange}
       >
-        {imageUrl && mode==='edit' ? <div className='imagePreview' onMouseEnter={this.showEdit} onMouseLeave={this.hideEdit}>{edit&&<span><EditOutlined /> Change image </span>}<img src={imageUrl.toString()} alt="avatar" style={{ width: '100%' }} /></div> : uploadButton}
+        {imageUrl ? <div className='imagePreview' onMouseEnter={showEdit} onMouseLeave={hideEdit}>{edit&&<span><EditOutlined /> Change image </span>}<img src={`${imageUrl}`} alt="avatar" style={{ width: '100%' }} /></div> : uploadButton}
       </Upload>
     );
-  }
 }
 
-export default uploadImage
+export default React.memo(UploadImage)

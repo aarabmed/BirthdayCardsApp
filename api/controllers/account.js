@@ -50,7 +50,7 @@ exports.userLogin = async (req, res, next) => {
 
     const {authority,_id,avatar}= user;
     const userId =_id.toString();
-    const token = await jwt.sign({userId,userName},process.env.SECRETCODE,{expiresIn:'60min'})
+    const token = await jwt.sign({userId,userName},process.env.SECRETCODE,{expiresIn:'60 min'})
     user.validToken = true;
     await user.save();
     const data = {

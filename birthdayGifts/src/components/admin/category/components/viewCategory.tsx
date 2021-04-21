@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {Tag, Modal, Divider} from "antd";
-import redirectToLogin from 'common/redirectToLogin'
-import checkAuth from 'common/auth'
+import isAuth from 'common/isAuthenticated'
 
   type category ={
     name:React.ReactChild,
@@ -9,7 +8,6 @@ import checkAuth from 'common/auth'
     status:React.ReactChild,
     createdAt:React.ReactChild,
     lastUpdate:React.ReactChild,
-    tags?:[React.ReactChild],
     subCategory?:[React.ReactChild],
     childrenSubCategory?:[React.ReactChild]
   }
@@ -17,21 +15,12 @@ const ModalView = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState({});
 
-  const showModal = async () => {
-    const isAuth = await checkAuth()
-    if(isAuth){
-      setIsModalVisible(true);
-      convert(props);
-      return
-    }
-    redirectToLogin()
-    
+  const showModal = () => {
+     isAuth(()=>{
+      setIsModalVisible(true) 
+      convert(props)
+     })
   };
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
 
 
   const handleCancel = () => {
@@ -63,13 +52,7 @@ const ModalView = (props) => {
         childrenSubCategory:value.childrenSubCategory.length?[value.childrenSubCategory.map((item)=>(<Tag color="success" key={item._id}>{item.name}</Tag>))]:[<span key='111'>no sub-items associated</span>],
       }
     }
-
-    newObject={
-      ...newObject,
-      tags:value.tags.length?[value.tags.map((item)=>(<Tag color="magenta" key={item._id}>{item.name}</Tag>))]:[<span key='111'>no tag associated</span>],
-    }
     
-
     setData(newObject);
   }
 
@@ -90,8 +73,6 @@ const ModalView = (props) => {
           return 'Sub-Categories'
       case 'childrenSubCategory':
         return 'Sub-Category-items'
-      case 'tags':
-        return 'Tags'
       case 'title':
         return 'Title'
       case 'name':
@@ -109,7 +90,7 @@ const ModalView = (props) => {
           <div
             className='categoryImage'
           >
-            <img alt="example" src={`/${record.image}`} />
+            <img alt="example" src={`/${record.image.path}`} />
           </div>
           <div className='modal-content'>
                 {

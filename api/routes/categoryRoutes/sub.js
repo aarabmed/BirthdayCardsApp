@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const checkAuth = require("../../middlewares/auth");
 const uploadImage = require("../../middlewares/imageUpload");
-const  {getAllSubCategories,createSubCategory, updateSubCategory,deleteSubCategory}= require('../../controllers/category/sub')
+const  {getSubCategory,getAllSubCategories,createSubCategory, updateSubCategory,deleteSubCategory}= require('../../controllers/category/sub')
 
 
 router.get("/", getAllSubCategories);
 
-// router.get("/categories/:categoryId", getCategory);
+router.get("/:id", getSubCategory);
 
 router.post("/new",uploadImage('subCategoryImage'), createSubCategory);
 

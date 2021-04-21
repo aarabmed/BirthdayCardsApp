@@ -5,7 +5,7 @@ import useSWR from "swr"
 import axios from 'axios'
 import moment from 'moment'
 
-import {tagColumns } from '../tables/tagColumns'
+import {tagColumns } from './tables/tagColumns'
 import AddTag from "./components/tagType";
 import { TAGS } from "common/apiEndpoints";
 

@@ -1,27 +1,21 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Row, Col, List, Empty, Pagination, Button } from "antd";
-import Icon from '@ant-design/icons';
-import Icons from 'assets/icons' 
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Row, Col, List, Empty, Pagination, Button, PageHeader } from "antd";
+import Skeleton from '@material-ui/lab/Skeleton';
 import Card from './components/bc-card'
-import ViewCard from './components/modals/viewCard'
+import ViewCard, { cardType } from './components/modals/viewCard'
 import axios from "axios";
 import { parseCookies } from "nookies";
 import { CARDS } from "common/apiEndpoints";
 import useSWR from "swr";
-import { useRouter } from "next/router";
-
+import { useSelector, useDispatch } from "react-redux";
+import { setNumberItemsPerPage,setPageNumber } from "redux/actions/cardActions";
+import AddCard from './components/modals/addCard'
+import isAuth from 'common/isAuthenticated'
 
 
 const { Body } = Card
 
 
-
-
-
-const p = {
-    page:1,
-    size:10
-}
 const axiosHeader = (value)=>{
   const {token} = parseCookies()
   const config = {
@@ -33,76 +27,136 @@ const axiosHeader = (value)=>{
 
 
 const fetcher = (url,params) => axios.get(url,axiosHeader(params)).then(res => res.data)
+
 const swrConfig = {
     revalidateOnFocus: false,
     refreshWhenHidden: false,
     refreshInterval: 0
 }
 
-type cardProps = {
-  title:string,
-  slug:string,
-  image:{path:string}
+
+const defaultCard:cardType={
+  _id:'',
+  title:'',
+  description:'',
+  slug:'',
+  status:false,
+  cardSize:[''],
+  createdBy:{
+    userId:'',
+    userName:'',
+    avatar:'',
+    authority:'',
+    token:'',
+  },
+  tags:[
+    {_id:'',name:'',}
+  ],
+  category:{_id:'',name:'',},
+  subCategory:{_id:'',name:'',},
+  subCategoryChild:{_id:'',name:''},
+  image:{path:''}
+
 }
 
+
 function Cards(props) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [loading,setLoading] = useState(true)
-  const [size,setSize] = useState(12)
-  const [pageNumber,setPageNumber] = useState(1)
+  const {pageNumber, pageSize} = useSelector((state)=> state.cardReducer)
 
-  const [cardsList, setCardList] = useState([])
+  const [size,setSize] = useState(pageSize)
+  const [page,setPageNM] = useState(pageNumber)
+  const [selectedCard,setSelectedCard] = useState(defaultCard)
+  const [cardsState,setCardsState] = useState([])
+
   const initialData = props.data
-  
 
-  //const page='1';
+  let cards = [];
 
-  const params = useMemo(()=>({pageNumber,size}),[pageNumber,size])
+  const params = useMemo(()=>({page,size}),[page,size])
 
   const { data, error, mutate,isValidating } = useSWR([CARDS,params], fetcher,swrConfig)
 
-  const {asPath} = useRouter()
 
   useEffect(()=>{
-    
-  },[])
+    if(data){
+      cards = data.data.map(el=>(
+        <Card
+            key={el._id}
+            item = {el}
+            onClick={onCardClicked}
+            afterRemove={refrechData}
+            cover={'/'+el.image.path}
+          >
+            <Body title={el.title} />
+        </Card>
+      ))
+      setCardsState(cards)
+    }
+  },[data])
+
+  const card = useRef(null)
+
+  const dispatch = useDispatch()
 
 
-  const onCardClicked =()=>{
-    console.log('Function executed')
-    setIsOpen(true)
+  const onCardClicked =(item:cardType)=>{
+    isAuth(()=>{
+      setSelectedCard({...defaultCard,...item})
+      card.current.openModal()
+    })
+  }
+
+
+  const refrechData = async ()=>{
+    await mutate()
+  }
+
+
+  const onEditCard = async ()=>{
+    const res = await mutate()
+
+    if(res){
+      const item = res.data.find(e=>e._id===selectedCard._id)
+      setSelectedCard(item)
+    }
   }
 
 
   
 
-  const onCardRemoved =()=>{
-    console.log('Cared Removed')
-  }
-  const closeModal =()=>{
-    setIsOpen(false)
-  }
-
   function onShowSizeChange(current, pageSize) {
-    //console.log(current, pageSize);
-    setSize(pageSize)
-    mutate()
-  }
-  function onPageChange(page){
-     setPageNumber(page)
+    isAuth(()=>{
+      setSize(pageSize)
+      dispatch(setNumberItemsPerPage(pageSize))
+    })
   }
 
-  //const newTotal = data.totalPages*size
+  async function onPageChange(page){
+    isAuth(()=>{
+      setPageNM(page)
+      dispatch(setPageNumber(page))
+    }) 
+  }
+
+
   return (
     <div className="cards-wrapper">
-      <ViewCard card='Speacial Card' isModalOpen={isOpen} closeModal={closeModal}/>
-      <Button type='primary' onClick={()=>console.log('data:',data)}> re-fetch</Button>
+      
       <div className="cards-container">
+        <PageHeader
+          ghost={false}
+          title="Cards list"
+          extra={[
+            <Button key="1">Load cards</Button>,
+            <AddCard  key="2"  runMutate={refrechData} />,
+          ]}
+        />
+        <ViewCard item={selectedCard} ref={card} runMutate={onEditCard} refresh={refrechData}/> 
         <List
             className="cards-container"
             itemLayout='horizontal'
             pagination={{
-              onChange: onPageChange,
+              onChange:onPageChange,
               current:pageNumber,
               pageSize:size,
               pageSizeOptions:['12','24','48','96'],
@@ -110,22 +164,15 @@ function Cards(props) {
               onShowSizeChange:onShowSizeChange,
               total:data?.totalPages*size||null
             }}
-            dataSource={data?.data}
-            loading={isValidating}
-            renderItem={(item:cardProps) => (
-              <Card
-                  onClick={onCardClicked}
-                  onRemove={onCardRemoved}
-                  cover={'/'+item.image.path}
-                >
-                  <Body title={item.title} />
-              </Card>
-            )}
+            children={cardsState}
+            loading={cardsState.length!==data?.data.length}
           />
       </div>
     </div>
   );
 }
+
+
 
 
 /* export async function getServerSideProps() {

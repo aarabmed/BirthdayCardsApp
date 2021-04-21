@@ -7,7 +7,7 @@ function Footer({ containerType }) {
   return (
     <div className="footer">
       <div className="footer-bottom">
-        <Container type={containerType}>
+        <Container type={containerType} cName='container-admin'>
           <p>Copyright © 2021 Orenji Inc. All rights reserved</p>
         </Container>
       </div>

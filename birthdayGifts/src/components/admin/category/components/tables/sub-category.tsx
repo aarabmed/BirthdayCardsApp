@@ -35,12 +35,11 @@ const SubCategory=()=>{
         key:elm._id,
         name:elm.name,
         slug:elm.slug,
-        image:elm.image.path,
+        image:elm.image,
         createdAt:moment(elm.createdAt).format('DD MMM YYYY'),
         updatedAt:moment(elm.updatedAt).format('DD MMM YYYY'),
         childrenSubCategory:elm.childrenSubCategory,
         status:elm.status,
-        tags:elm.tags.map(e=>({name:e.name,_id:e._id})),
         }))
 
     

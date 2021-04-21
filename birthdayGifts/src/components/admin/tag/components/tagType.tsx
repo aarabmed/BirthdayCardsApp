@@ -1,8 +1,7 @@
 import React, { useState,useEffect,useRef } from 'react';
 import { useSelector } from "react-redux";
 import axios from 'axios';
-import redirectToLogin from 'common/redirectToLogin'
-import checkAuth from 'common/auth'
+import isAuth from 'common/isAuthenticated'
 import useSWR,{mutate} from "swr"
 
 import { Modal, Button,Form,
@@ -37,6 +36,13 @@ const axiosHeader = ()=>{
 }
 
 
+const axiosInstance = axios.create({
+  validateStatus: function (status)
+  {
+      return true
+  }
+});
+
 
 const addTag:React.FC<Props> =({item,mode,runMutate}) => {
 
@@ -52,23 +58,9 @@ const addTag:React.FC<Props> =({item,mode,runMutate}) => {
   //========================================================================
 
 
- /*  useEffect(()=>{
-
-      console.log('ITEM:',item??undefined)
-      if(refForm.current){
-        const {name,slug,status} = item;
-        form.setFieldsValue({status,slug:'hhohohoh',name})
-      }
-    
-  },[refForm.current]) */
   
-  const showModal = async () => {
-      const isAuth = await checkAuth()
-      if(isAuth){
-        setIsModalVisible(true);
-        return
-      }
-      redirectToLogin()
+  const showModal = () => {
+      isAuth(()=>setIsModalVisible(true))
   };
 
   
@@ -79,22 +71,18 @@ const addTag:React.FC<Props> =({item,mode,runMutate}) => {
  
 
 
-  const handleOk = async () => {
-    const isAuth = await checkAuth()
-    form
+  const handleOk = () => {
+    isAuth(()=>{
+      form
       .validateFields()
       .then((values) => {
-        
-        if(isAuth){
-          mode==='add'?onCreate(values):onUpdate(values);
-          return
-        }
-        
-        redirectToLogin()
+        mode==='add'?onCreate(values):onUpdate(values);
       })
       .catch((info) => {
         console.log('Form errors', info);
-      });
+      })
+    
+    })
   };
 
 
@@ -108,19 +96,12 @@ const addTag:React.FC<Props> =({item,mode,runMutate}) => {
   const onCreate = (values:tagType) => { 
         setConfirmLoading(true);
         const newValues = {...values,currentUserId:userId}
-        const axiosInstance = axios.create({
-          validateStatus: function (status)
-          {
-              return true
-          }
-        });
-        
+      
         axiosInstance.post(
           `${TAGS}/new`,
           newValues,
           axiosHeader(),
         ).then(res=>{
-          console.log('Cat-res:',res)
             if (res.status===201) {
                 setTimeout(() => {
                   setIsModalVisible(false);
@@ -142,26 +123,20 @@ const addTag:React.FC<Props> =({item,mode,runMutate}) => {
 
       setConfirmLoading(true);
 
-      const axiosInstance = axios.create({
-        validateStatus: function (status)
-        {
-            return true
-        }
-      });
-
       axiosInstance.patch(
         `${TAGS}/${item.key}`,
         values,
         axiosHeader(),
       ).then(res=>{
-        console.log('Cat-res:',res)
-          if (res.status===201) {
+
+        if (res.status===201) {
               
               setTimeout(() => {
                 setIsModalVisible(false);
                 mutate(TAGS);
                 setConfirmLoading(false);
               }, 1000);
+
           }else{
               setConfirmLoading(false);
           }

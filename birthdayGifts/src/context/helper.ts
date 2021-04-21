@@ -4,10 +4,9 @@ import Router from "next/router";
 
 export const withAuth = async (handler) =>{
    
-   const isAuth = await checkAuth();
+   const isAuth = checkAuth();
    const oldRoute = Router.query.page
-   if(isAuth){
-         
+   if(isAuth){  
         return handler
    }
 

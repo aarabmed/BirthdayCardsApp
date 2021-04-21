@@ -10,3 +10,7 @@ export const USER = {
   REMOVE_USER: "REMOVE_USER",
 };
 
+export const PAGE = {
+  SET_PAGE_NUMBER: "PAGE_NUMBER",
+  SET_NUMBER_ITEMS_PER_PAGE: "NUMBER_ITEMS",
+};
